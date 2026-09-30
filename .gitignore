@@ -1,2 +1,7 @@
 *.lock
 *.csv
+data/raw/
+data/features/
+models/*.joblib
+__pycache__/
+.DS_Store
