@@ -1,0 +1,16 @@
+{
+  "loaded": {
+    "hf": 507195,
+    "kaggle": 522214
+  },
+  "dropped_invalid": 183,
+  "dropped_conflicting_labels": 93751,
+  "dropped_duplicates": 352230,
+  "final_rows": 480907,
+  "label_counts": {
+    "0": 379781,
+    "1": 101126
+  },
+  "train_rows": 384725,
+  "test_rows": 96182
+}

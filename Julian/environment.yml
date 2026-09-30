@@ -1,0 +1,11 @@
+name: phishing-url
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pandas
+  - scikit-learn
+  - matplotlib
+  - tldextract
+  - datasets
+  - joblib
