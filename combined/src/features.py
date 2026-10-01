@@ -47,7 +47,6 @@ def extract_features(url):
     main_domain = ".".join(labels[-2:])                
     lower = url.lower()
     brand_hits = [b for b in BRANDS if b in lower]
-    queries = url.partition("?")[2]
 
     return {
         "url_length": len(url),
@@ -68,9 +67,7 @@ def extract_features(url):
         #brand appears in the url but not in the owned domain
         "brand_not_in_domain": int(any(b not in main_domain for b in brand_hits)),
         "is_shortener": int(host in SHORTENERS),
-        "has_encoding": int("%" in url),
-        "num_queries" : queries.str.count("&") + 1 if queries != "" else 0,
-        "num_sub_domains": labels.count() if labels else 0
+        "has_encoding": int("%" in url)
     }
 
 
