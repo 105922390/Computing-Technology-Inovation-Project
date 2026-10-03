@@ -36,7 +36,7 @@ def clean_url(url):
      #domains are case insensitive so put in lowercase but paths are not and left alone
     url = host.lower() + sep + rest               
     #removes / from end of url paypal.com/ becomes paypal.com             
-    url = url.rstrip("/")                
+    url = url.rstrip("/")               
     #drops non web addresses                       
     return url if "." in host else None                         
 
@@ -69,12 +69,28 @@ def main():
     print("\nNulls:\n", df.isnull().sum())
     print("\nLabel counts by source:\n", df.groupby(["source", "label"]).size())
 
+    # clean urls
     df["url"] = df["url"].map(clean_url)
-    summary["dropped_invalid"] = int(df["url"].isna().sum())
+
+    summary["dropped_invalid"] = int(df["url"].isna().sum() +
+                                     df["url"].str.contains(r"\s", na=False).sum() +
+                                     df['url'].str.contains(r"[\x00-\x1F\x7F]", na=False).sum())
+    # remove rows with null values
     df = df.dropna(subset=["url"])
 
-    #same urls labelled both 0 and 1 dropped
+    # remove nay rows that have whitespace still in url (whitespace within urls are not valid)
+    df.drop(
+        df.loc[df["url"].str.contains(r"\s", na=False)].index
+        , inplace=True
+        )
+    
+    # remove any rows with unprintable characters
+    df.drop(
+        df.loc[df['url'].str.contains(r"[\x00-\x1F\x7F]", na=False)].index
+        , inplace=True
+        )
 
+    #same urls labelled both 0 and 1 dropped
     labels_per_url = df.groupby("url")["label"].nunique()
     conflicts = labels_per_url[labels_per_url > 1].index
     summary["dropped_conflicting_labels"] = len(conflicts)
