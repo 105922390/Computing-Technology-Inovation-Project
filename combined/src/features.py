@@ -6,6 +6,9 @@ import re
 from collections import Counter
 from pathlib import Path
 import pandas as pd
+from sklearn.model_selection import train_test_split
+from src import feature_conversion
+
 #TLDs heavily abused for phishing
 SUSPICIOUS_TLDS = {"tk", "ml", "ga", "cf", "gq", "xyz", "top", "work", "click", "link",
                    "zip", "review", "country", "kim", "science", "party", "loan", "win"}
@@ -73,18 +76,26 @@ def extract_features(url):
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--kaggle-w-feats", required=True)
     ap.add_argument("--in", dest="inp", default="data/processed")
     ap.add_argument("--out", default="data/features")
     args = ap.parse_args()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
 
-    for split in ["train", "test"]:
-        df = pd.read_csv(Path(args.inp) / f"{split}.csv")
-        feats = pd.DataFrame(df["url"].map(extract_features).tolist())
-        result = pd.concat([df[["url", "label"]], feats], axis=1)
-        result.to_csv(out / f"{split}_features.csv", index=False)
-        print(f"{split}: {len(result)} rows, {feats.shape[1]} features")
+    df = pd.read_csv(Path(args.inp) / "processed.csv")
+    feats = pd.DataFrame(df["url"].map(extract_features).tolist())
+    result = pd.concat([df[["url", "label"]], feats], axis=1)
+    result.to_csv(out / "features.csv", index=False)
+    print(f"extracted feature dataframe: {len(result)} rows, {feats.shape[1]} features")
+
+    df_alt_feats = feature_conversion.main(args.kaggle_w_feats, out)
+
+    all_df = pd.concat(df, df_alt_feats)
+
+    train, test = train_test_split(all_df, test_size=0.2, stratify=all_df["label"], random_state=42)
+    train.to_csv(out / "train_features.csv", index=False)
+    test.to_csv(out / "test_features.csv", index=False)
 
     print("\nAverage feature values by label (train):")
     print(pd.read_csv(out / "train_features.csv").drop(columns="url")

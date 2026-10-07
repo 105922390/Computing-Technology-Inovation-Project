@@ -92,6 +92,9 @@ def clean_data(df):
     df = df.drop_duplicates("url")
     summary["dropped_duplicates"] = before - len(df)
 
+    summary["final_rows"] = len(df)
+    summary["label_counts"] = df["label"].value_counts().sort_index().to_dict()
+
     return {df, summary}
 
 def main():
@@ -120,13 +123,13 @@ def main():
 	df = processed[0]
 	summary = processed[1]
 
-	train, test = train_test_split(df, test_size=0.2, stratify=df["label"], random_state=42)
-	train.to_csv(out / "train.csv", index=False)
-	test.to_csv(out / "test.csv", index=False)
-
-	summary["final_rows"] = len(df)
-	summary["label_counts"] = df["label"].value_counts().sort_index().to_dict()
-	summary["train_rows"], summary["test_rows"] = len(train), len(test)
+	# train, test = train_test_split(df, test_size=0.2, stratify=df["label"], random_state=42)
+	# train.to_csv(out / "train.csv", index=False)
+	# test.to_csv(out / "test.csv", index=False)
+	# summary["train_rows"], summary["test_rows"] = len(train), len(test)
+	
+	df.to_csv(out / "processed.csv", index=False)
+	
 	(out / "processing_summary.json").write_text(json.dumps(summary, indent=2))
 	print(json.dumps(summary, indent=2))
 
