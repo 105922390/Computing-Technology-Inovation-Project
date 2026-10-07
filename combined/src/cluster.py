@@ -15,7 +15,7 @@ SEED = 42
 def main():
     FIG_DIR.mkdir(parents=True, exist_ok=True)
     feats = pd.read_csv("data/features/train_features.csv")
-    feats["source"] = pd.read_csv("data/processed/train.csv")["source"].values
+    # feats["source"] = pd.read_csv("data/processed/train.csv")["source"].values
     feature_cols = [c for c in feats.columns if c not in ("url", "label", "source")]
 
     #clustering within a single class (no labels)

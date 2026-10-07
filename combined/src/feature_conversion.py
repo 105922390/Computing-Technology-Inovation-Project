@@ -18,6 +18,8 @@ def main(path, out):
     old_features = pd.DataFrame({"url": df["url"], "label": df["label"], "url_length": df["url_length"], "has_ip":df["has_ip"], "path_depth" : df["num_subdirs"], "suspicious_words": df["suspicious_words"], "num_special": df["special_char_count"], "num_digits": df["digits_count"], "source": "kaggle_w_feats"})
     
     feats = pd.DataFrame(df["url"].map(features.extract_features).tolist())
+    old_features = old_features.reset_index(drop=True)
+    feats = feats.reset_index(drop=True)
 
     combined = pd.DataFrame({
         "url": old_features["url"],

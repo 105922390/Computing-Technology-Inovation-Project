@@ -22,8 +22,8 @@ def main():
     MODELS_DIR.mkdir(exist_ok=True)
     FIG_DIR.mkdir(parents=True, exist_ok=True)
 
-    train = pd.read_csv(FEATURES_DIR / "train_features.csv")
-    test = pd.read_csv(FEATURES_DIR / "test_features.csv")
+    train = pd.read_csv(FEATURES_DIR / "train_features.csv").drop(columns="source")
+    test = pd.read_csv(FEATURES_DIR / "test_features.csv").drop(columns="source")
     feature_cols = [c for c in train.columns if c not in ("url", "label")]
     X_train, y_train = train[feature_cols], train["label"]
     X_test, y_test = test[feature_cols], test["label"]

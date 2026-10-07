@@ -18,11 +18,11 @@ def save(name):
 
 def main():
     FIG_DIR.mkdir(parents=True, exist_ok=True)
-    processed = pd.concat([pd.read_csv(f"data/processed/{s}.csv") for s in ("train", "test")])
+    # processed = pd.concat([pd.read_csv(f"data/processed/{s}.csv") for s in ("train", "test")])
     feats = pd.concat([pd.read_csv(f"data/features/{s}_features.csv") for s in ("train", "test")])
 
     #class balance
-    counts = processed["label"].value_counts().sort_index()
+    counts = feats["label"].value_counts().sort_index()
     ax = counts.rename(NAMES).plot.bar(color=[COLOURS[0], COLOURS[1]], figsize=(5, 4), rot=0)
     for i, v in enumerate(counts):
         ax.text(i, v, f"{v:,}\n({v / counts.sum():.0%})", ha="center", va="bottom")
@@ -32,13 +32,14 @@ def main():
     save("class_balance")
 
     #where each class comes from
-    by_source = processed.groupby(["source", "label"]).size().unstack().rename(columns=NAMES)
+    by_source = feats.groupby(["source", "label"]).size().unstack().rename(columns=NAMES)
     ax = by_source.plot.bar(stacked=True, color=[COLOURS[0], COLOURS[1]], figsize=(5, 4), rot=0)
     ax.set_ylabel("Number of URLs")
     ax.set_title("URLs by source dataset")
     save("by_source")
 
     #distributions of the main numeric features
+    feats = feats.drop(columns="source")
     numeric = ["host_length", "num_dots_host", "num_hyphens_host", "num_digits", "host_entropy", "path_length"]
     fig, axes = plt.subplots(2, 3, figsize=(12, 7))
     for ax, col in zip(axes.flat, numeric):

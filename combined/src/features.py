@@ -85,9 +85,9 @@ def main():
 
     df = pd.read_csv(Path(args.inp) / "processed.csv")
     feats = pd.DataFrame(df["url"].map(extract_features).tolist())
-    result = pd.concat([df[["url", "label"]], feats], axis=1)
+    result = pd.concat([df[["url", "label"]], feats, df["source"]], axis=1)
 
-    df_alt_feats = feature_conversion.main(args.kaggle_w_feats, out).drop(columns="source")
+    df_alt_feats = feature_conversion.main(args.kaggle_w_feats, out)
     all_df = pd.concat([result, df_alt_feats], ignore_index=True)
 
     all_df.to_csv(out / "features.csv", index=False)
@@ -98,7 +98,7 @@ def main():
     test.to_csv(out / "test_features.csv", index=False)
 
     print("\nAverage feature values by label (train):")
-    print(pd.read_csv(out / "train_features.csv").drop(columns="url")
+    print(pd.read_csv(out / "train_features.csv").drop(columns="url").drop(columns="source")
           .groupby("label").mean().T.round(3))
 
 if __name__ == "__main__":
