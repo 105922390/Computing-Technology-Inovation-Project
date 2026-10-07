@@ -24,7 +24,7 @@ def load_hf_kmak(path):
 	return pd.DataFrame({"url": df["text"], "label": df["label"], "source": "hugging_face_kmak"})
 def load_hf_mitake(path):
 	df = pd.read_csv(path)
-	return pd.DataFrame({"url": df["url"], "label": df["label"], "source": "hugging_face_mitake"})
+	return pd.DataFrame({"url": df["url"], "label": df["label"], "source": "hugging_face_mitake"}) 
 
 def clean_url(url):
 	if not isinstance(url, str):
@@ -43,6 +43,56 @@ def clean_url(url):
 	#drops non web addresses                       
 	return url if "." in host else None                         
 
+
+def clean_data(df):
+    summary = {}
+    summary["loaded"] = df.groupby("source").size().to_dict()
+
+    #raw data overview added from cleaning.py (merged from ash's original code)
+    print("\n--- Raw data overview ---")
+    print("Shape:", df.shape)
+    df.info()
+    print("\nNulls:\n", df.isnull().sum())
+    print("\nLabel counts by source:\n", df.groupby(["source", "label"]).size())
+
+    # clean urls
+    df["url"] = df["url"].map(clean_url)
+
+    summary["dropped_invalid"] = int(df["url"].isna().sum() +
+                                    df["url"].str.contains(r"\s", na=False).sum() +
+                                    df['url'].str.contains(r"[\x00-\x1F\x7F]", na=False).sum())
+    # remove rows with null values
+    df = df.dropna(subset=["url"])
+
+    # remove nay rows that have whitespace still in url (whitespace within urls are not valid)
+    df.drop(
+        df.loc[df["url"].str.contains(r"\s", na=False)].index
+        , inplace=True
+        )
+
+    # remove rows with tabs
+    df.drop(
+            df.loc[df["url"].str.contains(r"\t", na=False)].index
+            , inplace=True
+            )
+
+    # remove any rows with unprintable characters
+    df.drop(
+        df.loc[df['url'].str.contains(r"[\x00-\x1F\x7F]", na=False)].index
+        , inplace=True
+        )
+
+    #same urls labelled both 0 and 1 dropped
+    labels_per_url = df.groupby("url")["label"].nunique()
+    conflicts = labels_per_url[labels_per_url > 1].index
+    summary["dropped_conflicting_labels"] = len(conflicts)
+    df = df[~df["url"].isin(conflicts)]
+
+    before = len(df)
+    df = df.drop_duplicates("url")
+    summary["dropped_duplicates"] = before - len(df)
+
+    return {df, summary}
 
 def main():
 	ap = argparse.ArgumentParser()
@@ -65,51 +115,10 @@ def main():
 		load_hf_mitake(args.hf_mitake)], 
 		ignore_index=True)
 	
-	summary["loaded"] = df.groupby("source").size().to_dict()
+	processed = clean_data(df)
 
-	#raw data overview added from cleaning.py (merged from ash's original code)
-	print("\n--- Raw data overview ---")
-	print("Shape:", df.shape)
-	df.info()
-	print("\nNulls:\n", df.isnull().sum())
-	print("\nLabel counts by source:\n", df.groupby(["source", "label"]).size())
-
-	# clean urls
-	df["url"] = df["url"].map(clean_url)
-
-	summary["dropped_invalid"] = int(df["url"].isna().sum() +
-									df["url"].str.contains(r"\s", na=False).sum() +
-									df['url'].str.contains(r"[\x00-\x1F\x7F]", na=False).sum())
-	# remove rows with null values
-	df = df.dropna(subset=["url"])
-
-	# remove nay rows that have whitespace still in url (whitespace within urls are not valid)
-	df.drop(
-		df.loc[df["url"].str.contains(r"\s", na=False)].index
-		, inplace=True
-		)
-
-	# remove rows with tabs
-	df.drop(
-			df.loc[df["url"].str.contains(r"\t", na=False)].index
-			, inplace=True
-			)
-	
-	# remove any rows with unprintable characters
-	df.drop(
-		df.loc[df['url'].str.contains(r"[\x00-\x1F\x7F]", na=False)].index
-		, inplace=True
-		)
-
-	#same urls labelled both 0 and 1 dropped
-	labels_per_url = df.groupby("url")["label"].nunique()
-	conflicts = labels_per_url[labels_per_url > 1].index
-	summary["dropped_conflicting_labels"] = len(conflicts)
-	df = df[~df["url"].isin(conflicts)]
-
-	before = len(df)
-	df = df.drop_duplicates("url")
-	summary["dropped_duplicates"] = before - len(df)
+	df = processed[0]
+	summary = processed[1]
 
 	train, test = train_test_split(df, test_size=0.2, stratify=df["label"], random_state=42)
 	train.to_csv(out / "train.csv", index=False)
