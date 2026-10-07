@@ -7,6 +7,7 @@ RAW_ARGS = ["--hf-files", "data/raw/hf_phishing_urls/train.csv", "data/raw/hf_ph
             "--kaggle", "data/raw/kaggle/malicious_phish.csv", 
             "--decoded-qr", "data/raw/qr_to_url.csv",
             "--hf-kmak", "data/raw/hf_kmak.csv",
+            "--hf-mitake", "data/raw/hf_mitake.csv",
             "--out", "data/processed"]
 
 STAGES = [
