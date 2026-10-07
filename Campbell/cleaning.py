@@ -6,28 +6,28 @@ df = pd.read_csv("hf://datasets/Mitake/PhishingURLsANDBenignURLs/PhishBenignData
 ## CLEANING
 
 # Get rid of leading & trailing whitespace & endlines
-# df['url'] = df['url'].str.strip()
+df['url'] = df['url'].str.strip()
 
 # Get rid of white spaces
 # df["url"] = df.drop() df["url"].str.contains(" ")
-# df.drop(
-#     df.loc[df["url"].str.contains(" ", na=False)].index,
-#     inplace=True
-# )
+df.drop(
+    df.loc[df["url"].str.contains(" ", na=False)].index,
+    inplace=True
+)
 
 
 
 # Remove quotation marks
-# df["url"] = df["url"].str.strip("\'").str.strip("\"")
+df["url"] = df["url"].str.strip("\'").str.strip("\"")
 
 # print(df.isnull().sum())
 
 # print(df["url"].duplicated().sum())
 
-# duplicate_rows = df["url"].duplicated(keep=False).index
-# df = df.drop(duplicate_rows)
+duplicate_rows = df["url"].duplicated(keep=False).index
+df = df.drop(duplicate_rows)
 
-# print(duplicate_rows[["url", "label"]])
+print(duplicate_rows[["url", "label"]])
 
 
 ## Download

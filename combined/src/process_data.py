@@ -88,6 +88,12 @@ def main():
 		df.loc[df["url"].str.contains(r"\s", na=False)].index
 		, inplace=True
 		)
+
+	# remove rows with tabs
+	df.drop(
+			df.loc[df["url"].str.contains(r"\t", na=False)].index
+			, inplace=True
+			)
 	
 	# remove any rows with unprintable characters
 	df.drop(
