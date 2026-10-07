@@ -19,7 +19,7 @@ def load_cic_decoded_qr(path):
 	return pd.DataFrame({"url": df["url"], "label": df["label"], "source": "cic_decoded_qr"})
 def load_hf_kmak(path):
 	df = pd.read_csv(path)
-	return pd.DataFrame({"url": df["text"], "label": df["label"], "source": "hugging_face_kmak"})
+	return pd.DataFrame({"url": df["url"], "label": df["label"], "source": "hugging_face_kmak"})
 def load_hf_mitake(path):
 	df = pd.read_csv(path)
 	return pd.DataFrame({"url": df["url"], "label": df["label"], "source": "hugging_face_mitake"}) 
@@ -93,7 +93,7 @@ def clean_data(df):
     summary["final_rows"] = len(df)
     summary["label_counts"] = df["label"].value_counts().sort_index().to_dict()
 
-    return {df, summary}
+    return df, summary
 
 def main():
 	ap = argparse.ArgumentParser()
@@ -102,6 +102,7 @@ def main():
 	ap.add_argument("--decoded-qr", required=True)
 	ap.add_argument("--hf-kmak", required=True)
 	ap.add_argument("--hf-mitake", required=True)
+	ap.add_argument("--kaggle-w-feats", required=True)
 	ap.add_argument("--out", default="data/processed")
 	args = ap.parse_args()
 	out = Path(args.out)
@@ -116,10 +117,7 @@ def main():
 		load_hf_mitake(args.hf_mitake)], 
 		ignore_index=True)
 	
-	processed = clean_data(df)
-
-	df = processed[0]
-	summary = processed[1]
+	df, summary = clean_data(df)
 
 	# train, test = train_test_split(df, test_size=0.2, stratify=df["label"], random_state=42)
 	# train.to_csv(out / "train.csv", index=False)

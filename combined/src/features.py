@@ -7,7 +7,7 @@ from collections import Counter
 from pathlib import Path
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from src import feature_conversion
+from . import feature_conversion
 
 #TLDs heavily abused for phishing
 SUSPICIOUS_TLDS = {"tk", "ml", "ga", "cf", "gq", "xyz", "top", "work", "click", "link",
@@ -87,8 +87,8 @@ def main():
     feats = pd.DataFrame(df["url"].map(extract_features).tolist())
     result = pd.concat([df[["url", "label"]], feats], axis=1)
 
-    df_alt_feats = feature_conversion.main(args.kaggle_w_feats, out)
-    all_df = pd.concat(result, df_alt_feats)
+    df_alt_feats = feature_conversion.main(args.kaggle_w_feats, out).drop(columns="source")
+    all_df = pd.concat([result, df_alt_feats], ignore_index=True)
 
     all_df.to_csv(out / "features.csv", index=False)
     print(f"extracted feature dataframe: {len(all_df)} rows, {feats.shape[1]} features")

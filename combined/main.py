@@ -13,7 +13,7 @@ RAW_ARGS = ["--hf-files", "data/raw/hf_phishing_urls/train.csv", "data/raw/hf_ph
 
 STAGES = [
     ("process",  process_data.main,     RAW_ARGS),
-    ("features", features.main,         []),
+    ("features", features.main,         ["--kaggle-w-feats", "data/raw/kaggle_w_feats.csv"]),
     ("eda",      eda.main,              []),
     ("train",    train_classifier.main, []),
     ("cluster",  cluster.main,          []),
