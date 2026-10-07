@@ -86,12 +86,12 @@ def main():
     df = pd.read_csv(Path(args.inp) / "processed.csv")
     feats = pd.DataFrame(df["url"].map(extract_features).tolist())
     result = pd.concat([df[["url", "label"]], feats], axis=1)
-    result.to_csv(out / "features.csv", index=False)
-    print(f"extracted feature dataframe: {len(result)} rows, {feats.shape[1]} features")
 
     df_alt_feats = feature_conversion.main(args.kaggle_w_feats, out)
+    all_df = pd.concat(result, df_alt_feats)
 
-    all_df = pd.concat(df, df_alt_feats)
+    all_df.to_csv(out / "features.csv", index=False)
+    print(f"extracted feature dataframe: {len(all_df)} rows, {feats.shape[1]} features")
 
     train, test = train_test_split(all_df, test_size=0.2, stratify=all_df["label"], random_state=42)
     train.to_csv(out / "train_features.csv", index=False)
