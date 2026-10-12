@@ -7,6 +7,8 @@ import AboutTool from './pages/AboutTool.jsx'
 import AboutPhishing from './pages/AboutPhishing.jsx'
 import Help from './pages/Help.jsx'
 import UrlChecker from './pages/UrlChecker.jsx'
+import PageNotExist from './pages/error_pages/PageNotExist.jsx'
+import UnexpectedFailure from './pages/error_pages/UnexpectedFailure.jsx'
 
 // Components and layouts
 import MainLayout from './layouts/MainLayout.jsx'
@@ -24,6 +26,8 @@ function App({ themeMode, onToggleThemeMode }) {
 				<Route path="/about-phishing" element={<AboutPhishing />} />
 				<Route path="/help" element={<Help />} />
 				<Route path="/url-checker" element={<UrlChecker />} />
+				<Route path="/error-unexpected-failure" element={<UnexpectedFailure />} />
+				<Route path="*" element={<PageNotExist />} />
 			</Route>
 		</Routes>
 	);
