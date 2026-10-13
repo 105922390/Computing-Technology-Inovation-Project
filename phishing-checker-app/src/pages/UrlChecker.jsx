@@ -14,7 +14,7 @@ function DataDisplay({safety, trust, breakdown}) {
 			<Typography>Returned</Typography>
 			<Typography>Verdict: {safety}</Typography>
 			<Typography>AI Trust: {trust}</Typography>
-			<Typography>Breakdown</Typography>
+			<Typography>Breakdown: </Typography>
 			{breakdown?.map((item, index) => (
 				<Typography key={index}>{item}</Typography>
 			))}
@@ -25,7 +25,7 @@ function DataDisplay({safety, trust, breakdown}) {
 async function fetchPrediction(inputUrl){
 	const response = await axios.post(
 		'http://localhost:8000/process-data', 
-		{ inputUrl }
+		{ url : inputUrl }
 	);
 
 	return response.data.result
@@ -68,7 +68,7 @@ export default function UrlChecker() {
 
 			setHaveReturn(true)
 		} catch (error) {
-			setError('Error analysing url. Please try again.');
+			setError('Error analysing url. Please try again. | ' + error);
 			console.error(error);
 		} finally {
 			setLoading(false);
@@ -106,12 +106,12 @@ export default function UrlChecker() {
 					<Typography>Analysing URL...</Typography>
 				):(
 					error && (
-					<Typography>Error:{error}</Typography>
+					<Typography>{error}</Typography>
 					)
 				)
 			}
 
-			{haveReturn&& (
+			{haveReturn && (
 					<DataDisplay
 					safety = {predictedSafety}
 					trust = {trustScore}
