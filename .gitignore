@@ -33,3 +33,8 @@ dist-ssr
 *.sln
 *.sw?
 
+# Environment files
+.env
+
+# Virtual environments
+.venv/
