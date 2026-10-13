@@ -1,6 +1,7 @@
 
 import {
-	Typography, Container
+	Typography, Container,
+	Input
 } from '@mui/material';
 import { useEffect } from 'react';
 
@@ -8,7 +9,7 @@ function UrlInput() {
 	return (
 		<>
 		<label for="url">Insert URL: </label>
-		<input type="text" id="url" name="url" placeholder="https://example.com" />
+		<Input type="text" id="url" name="url" placeholder="https://example.com" />
 		</>
 	)
 }
@@ -29,6 +30,7 @@ export default function UrlChecker() {
 				This page contains the tool.
 			</Typography>
 			<UrlInput />
+			
 		</Container>
 	);
 }
