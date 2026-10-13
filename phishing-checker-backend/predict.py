@@ -17,8 +17,8 @@ try:                                            # run as a script: python src/pr
     from features import extract_features, split_host, SUSPICIOUS_WORDS, BRANDS, SUSPICIOUS_TLDS
     from process_data import clean_url
 except ImportError:                             # imported as a package: from src.predict import ...
-    from src.features import extract_features, split_host, SUSPICIOUS_WORDS, BRANDS, SUSPICIOUS_TLDS
-    from src.process_data import clean_url
+    from features import extract_features, split_host, SUSPICIOUS_WORDS, BRANDS, SUSPICIOUS_TLDS
+    from process_data import clean_url
 
 MODEL_PATH = Path("models/classifier.joblib")
 _bundle = None
