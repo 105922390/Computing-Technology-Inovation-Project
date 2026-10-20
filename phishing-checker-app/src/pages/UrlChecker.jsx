@@ -57,9 +57,22 @@ function featureDisplay(type, value){
 	// }
 }
 
-function ResultDisplay({is_phish, confidence, data, trust}) {
+function ResultDisplay({is_phish, confidence, data, trust, startProb}) {
 	return(
 		<Box>
+			{/* /Debug what is in data/ */}
+			{/* <Typography>type of returned data:{typeof(data)}</Typography>
+			{
+				Object.keys(data).map((feature) =>
+					<Box>
+						<Typography>feat type: {typeof(feature)} feat: {feature}</Typography>
+						<Typography>val type: {typeof(data[feature])}</Typography>
+						<Typography>value: {data[feature]['value']} contribution: {data[feature]['contribution']}</Typography>
+					</Box>
+				)
+			} */}
+
+
 			<Paper>
 				<Typography>Verdict: { is_phish == true ? "Not Safe" : is_phish == false ? "Safe" : "Error no result"}</Typography>
 				<Typography>Trust Score: {trust}</Typography>
@@ -68,6 +81,7 @@ function ResultDisplay({is_phish, confidence, data, trust}) {
 
 				<WaterfallChart
 				data = {data}
+				startProb = {startProb}
 				/>
 			</Paper>
 		</Box>
@@ -96,12 +110,13 @@ export default function UrlChecker() {
 	const [predictedSafety, setPredictedSafety] = useState(null); // string (want to change to bool)
 	const [confidence, setConfidence] = useState(Number);
 	const [trustScore, setTrustScore] = useState(Number);
-	const [breakdownData, setBreakdownData] = useState([]); // array of strings (may want to change this to be more specific to each explain type)
+	const [breakdownData, setBreakdownData] = useState({}); // array of strings (may want to change this to be more specific to each explain type)
 	
 	// Tool state values
 	const [error, setError] = useState(String); // string
 	const [loading, setLoading] = useState(false); // bool
 	const [haveReturn, setHaveReturn] = useState(false); // bool
+	const [breakdownBaseProb, setBreakdownBaseProb] = useState(false);
 
 	// History
 	const [history, setHistory] = useState([])
@@ -113,8 +128,6 @@ export default function UrlChecker() {
 		setError(null);
 		setLoading(true);
 
-		// Currently old data is 
-		// If want old data to reset whenever a new url is submitted
 		// setPredictedSafety(null);
 		// setConfidence(null);
 		// setBreakdownData(null);
@@ -128,6 +141,7 @@ export default function UrlChecker() {
 			setConfidence(result.confidence);
 			setTrustScore(result.trust_score);
 			setBreakdownData(result.result_data);
+			setBreakdownBaseProb(result.base_prob);
 
 			setHaveReturn(true)
 
@@ -176,12 +190,25 @@ export default function UrlChecker() {
 				)
 			}
 
+			{/* /Debug what is in data/ */}
+			{/* <Typography>type of returned data:{typeof(breakdownData)}</Typography>
+			{
+				Object.keys(breakdownData).map((feature) =>
+					<Box>
+						<Typography>feat type: {typeof(feature)} feat: {feature}</Typography>
+						<Typography>val type: {typeof(breakdownData[feature])}</Typography>
+						<Typography>value: {breakdownData[feature]['value']} contribution: {breakdownData[feature]['contribution']}</Typography>
+					</Box>
+				)
+			} */}
+			
 			{haveReturn && !error &&(
 					<ResultDisplay
 					is_phish = {predictedSafety}
 					confidence = {confidence}
 					data = {breakdownData}
 					trust = {trustScore}
+					startProb = {breakdownBaseProb}
 					/>
 				)
 			}
