@@ -81,8 +81,19 @@ def predict_url(url):
     confidence = probablility[result] * 100, 2
     verdict = True if result == 1 else False
 
-    resultData = mapResultData(url, df, shap_details[0, :, result], feature_cols)
-    base_prob = float(explainer.expected_value[result])
+    # Getting data oriented around a "safe" result by using 0 (see annotation below)
+    # So in later results display:
+    # + contribution = more safe
+    # - contibution = less safe
+    # which is more intuitive
+
+    #                                                      0]
+    #                                                      |
+    resultData = mapResultData(url, df, shap_details[0, :, 0], feature_cols)
+    base_prob = float(explainer.expected_value[0])
+    #                                          |
+    #                                         [0]
+
     return {
         "confidence": confidence, 
         "trust_score": trust, 

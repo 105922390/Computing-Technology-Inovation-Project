@@ -82,6 +82,7 @@ function ResultDisplay({is_phish, confidence, data, trust, startProb}) {
 				<WaterfallChart
 				data = {data}
 				startProb = {startProb}
+				roundTo = {2}
 				/>
 			</Paper>
 		</Box>
