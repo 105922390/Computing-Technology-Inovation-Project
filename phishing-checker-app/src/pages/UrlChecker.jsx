@@ -10,6 +10,9 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import DonutChart from "../components/visualisations/URLDonutChart.jsx";
 import WaterfallChart from "../components/visualisations/ContributionWaterfallGraph.jsx";
+import AboutFeature from "../components/FeatureDetails.jsx"
+
+import '../css/general.css'
 
 class UrlData {
   constructor(url, prediction, certainty) {
@@ -20,6 +23,17 @@ class UrlData {
 }
 
 function ResultDisplay({is_phish, confidence, data, trust, startProb}) {
+	const [currentFeatureId, setCurrentFeatureId] = useState("")
+	const [shown, setShown] = useState("")
+	const [others, setOthers] = useState("")
+	
+	function onClickFeatureBar(featureId, shown, others){
+		console.log("click recived, feature:" + featureId)
+		setCurrentFeatureId(featureId)
+		setShown(shown)
+		setOthers(others)
+	}
+	
 	return(
 		<Box>
 			{/* /Debug what is in data/ */}
@@ -34,18 +48,47 @@ function ResultDisplay({is_phish, confidence, data, trust, startProb}) {
 				)
 			} */}
 
-			<Paper>
+			<Paper className='page-section'>
+				
 				<Typography>Verdict: { is_phish == true ? "Not Safe" : is_phish == false ? "Safe" : "Error no result"}</Typography>
-				<Typography>Trust Score: {trust}</Typography>
-				<Typography>AI Confidence: {confidence}</Typography>
-				<Typography>Breakdown: </Typography>
-
+				<Typography>Trust Score: {Math.round(trust[0]*100)/100}%</Typography>
+				<Typography>AI Confidence: {Math.round(confidence[0]*100)/100}%</Typography>
+				
+				{/* <Typography variant='body2' sx={{m: 2}}
+				>Key features identified in the URL</Typography> */}
+				
+				<Typography 
+				variant='h5' sx={{alignSelf: 'center'}}
+				>Prediction Breakdown</Typography>
 				<WaterfallChart
 				data = {data}
 				startProb = {startProb}
-				is_phish={is_phish}
+				onClickBar = {onClickFeatureBar}
 				/>
 			</Paper>
+
+			{(currentFeatureId == 'other')&&(
+				<Typography variant='h5'>Other Features</Typography>
+			)}
+
+			{currentFeatureId && (currentFeatureId != "") &&(
+				<Paper className='page-section'>
+					{(currentFeatureId != 'other')&& (
+						<AboutFeature
+						featureId={currentFeatureId}
+						value={data[currentFeatureId].value}
+						/>
+					)}
+					{(currentFeatureId == 'other')&& (
+						<div className='feature-desc-container'>	
+							{others.map(feature => <AboutFeature
+							featureId={feature}
+							value={data[feature].value}
+							/>)}
+						</div>
+					)}
+				</Paper>
+			)}
 		</Box>
 	)
 }
@@ -79,12 +122,9 @@ export default function UrlChecker() {
 	const [loading, setLoading] = useState(false); // bool
 	const [haveReturn, setHaveReturn] = useState(false); // bool
 	const [breakdownBaseProb, setBreakdownBaseProb] = useState(false);
-	const [shapDetails, setShapDetails] = useState({});
-	const [boo, setBoo] = useState("old");
 
 	// History
 	const [history, setHistory] = useState([])
-
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();
@@ -106,8 +146,6 @@ export default function UrlChecker() {
 			setTrustScore(result.trust_score);
 			setBreakdownData(result.result_data);
 			setBreakdownBaseProb(result.base_prob);
-			setShapDetails(result.shap);
-			setBoo(result.boo);
 
 			setHaveReturn(true)
 
@@ -122,13 +160,13 @@ export default function UrlChecker() {
 	
 
 	return (
-		<Container>
+		<Container className='main-w-side'>
 			<Typography variant='h2' component='h1' gutterBottom>
 				URL Checker
 			</Typography>
 
 			<Typography variant='h5' component="h2" gutterBottom>
-				This page contains the tool.
+				Scan your URL
 			</Typography>
 			{/* <UrlInput /> */}
 
@@ -179,10 +217,12 @@ export default function UrlChecker() {
 				)
 			}
 
-			<Paper>
-				<Typography>Test Pie Chart</Typography>
-				<DonutChart/>	
-			</Paper>
+			<aside className='aside-info'>
+				<Paper>
+					<Typography>Test Pie Chart</Typography>
+					<DonutChart/>	
+				</Paper>
+			</aside>
 					
 		</Container>
 	);

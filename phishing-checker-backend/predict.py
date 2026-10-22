@@ -83,7 +83,6 @@ def predict_url(url):
 
     # Getting data oriented around a positive (phishing) result by using 1 (see annotation below)
     # So in later results display, contribution is towards likelyhood of phishing.
-
     #                                                      1]
     #                                                      |
     resultData = mapResultData(url, df, shap_details[0, :, 1], feature_cols)
