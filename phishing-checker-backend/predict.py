@@ -81,18 +81,15 @@ def predict_url(url):
     confidence = probablility[result] * 100, 2
     verdict = True if result == 1 else False
 
-    # Getting data oriented around a "safe" result by using 0 (see annotation below)
-    # So in later results display:
-    # + contribution = more safe
-    # - contibution = less safe
-    # which is more intuitive
+    # Getting data oriented around a positive (phishing) result by using 1 (see annotation below)
+    # So in later results display, contribution is towards likelyhood of phishing.
 
-    #                                                      0]
+    #                                                      1]
     #                                                      |
-    resultData = mapResultData(url, df, shap_details[0, :, 0], feature_cols)
-    base_prob = float(explainer.expected_value[0])
+    resultData = mapResultData(url, df, shap_details[0, :, 1], feature_cols)
+    base_prob = float(explainer.expected_value[1])
     #                                          |
-    #                                         [0]
+    #                                         [1]
 
     return {
         "confidence": confidence, 

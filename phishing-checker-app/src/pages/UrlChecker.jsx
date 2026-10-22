@@ -8,8 +8,8 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import DonutChart from "../components/URLDonutChart.jsx";
-import WaterfallChart from "../components/ContributionWaterfallGraph.jsx";
+import DonutChart from "../components/visualisations/URLDonutChart.jsx";
+import WaterfallChart from "../components/visualisations/ContributionWaterfallGraph.jsx";
 
 class UrlData {
   constructor(url, prediction, certainty) {
@@ -17,44 +17,6 @@ class UrlData {
     this.prediction = prediction;
     this.certainty = certainty;
   }
-}
-
-// """Plain-English reasons, pointing at the part of the URL that looks suspicious.
-//     These are for the user to read; the model itself uses all 18 features."""
-
-function featureDisplay(type, value){
-	return <Typography>if {type}: {value}</Typography>
-
-	// switch(type){
-	// 	case "has_at":
-	// 		return <Typography key={type}>Contains '@': the browser ignores everything before it, the real site is {value}</Typography> 
-	// 		// return <Typography>switch {type}: {value}</Typography>
-	// }
-	
-	// switch(type){
-	// 	case "has_ip":
-	// 		return <Typography key={type}>Uses an IP address ({value}) instead of a domain name</Typography> 
-	// 	case "has_at":
-	// 		return <Typography key={type}>Contains '@': the browser ignores everything before it, the real site is {value}</Typography> 
-	// 	case "has_port":
-	// 		return <Typography key={type}>Specifies an unusual port number of {value}</Typography>
-	// 	 case "suspicious_tld":
-	// 		return <Typography key={type}>Ends in .{value}, a top-level domain often abused for phishing</Typography>
-	// 	case "brand_not_in_domain":
-	// 		return <Typography key={type}>Mentions {', '.join(value)} but the site is not {value[0]}'s own domain</Typography>
-	// 	case "suspicious_words":
-	// 		return <Typography key={type}>Contains login/account words: {', '.join(value)}</Typography>
-	// 	case "is_shortener":
-	// 		return <Typography key={type}>Uses a link shortener, which hides the real destination</Typography>
-	// 	case "num_hyphens_host":
-	// 		return <Typography key={type}>Domain has {value} hyphens, common in look-alike domains</Typography>
-	// 	case "num_dots_host":
-	// 		return <Typography key={type}>Many subdomains ({value} dots in the host), can hide the real domain</Typography>
-	// 	case "url_length":
-	// 		return <Typography key={type}>Very long address ({value} characters)</Typography>
-	// 	case "digit_ratio":
-	// 		return <Typography key={type}>{value*100}% of the address is digits, e.g. random tokens</Typography>
-	// }
 }
 
 function ResultDisplay({is_phish, confidence, data, trust, startProb}) {
@@ -72,16 +34,20 @@ function ResultDisplay({is_phish, confidence, data, trust, startProb}) {
 				)
 			} */}
 
-
 			<Paper>
 				<Typography>Verdict: { is_phish == true ? "Not Safe" : is_phish == false ? "Safe" : "Error no result"}</Typography>
 				<Typography>Trust Score: {trust}</Typography>
 				<Typography>AI Confidence: {confidence}</Typography>
 				<Typography>Breakdown: </Typography>
 
+				
+				{/* <ShapWaterfall></ShapWaterfall> */}
+
+
 				<WaterfallChart
 				data = {data}
 				startProb = {startProb}
+				is_phish={is_phish}
 				/>
 			</Paper>
 		</Box>
@@ -117,6 +83,8 @@ export default function UrlChecker() {
 	const [loading, setLoading] = useState(false); // bool
 	const [haveReturn, setHaveReturn] = useState(false); // bool
 	const [breakdownBaseProb, setBreakdownBaseProb] = useState(false);
+	const [shapDetails, setShapDetails] = useState({});
+	const [boo, setBoo] = useState("old");
 
 	// History
 	const [history, setHistory] = useState([])
@@ -135,13 +103,15 @@ export default function UrlChecker() {
 		try {
 			// Axios call to backend, ask predicted saftey of provided url
 			const result = await fetchPrediction(url)
-
+			console.log("got return")
 			setError(result.error)
 			setPredictedSafety(result.is_phish);
 			setConfidence(result.confidence);
 			setTrustScore(result.trust_score);
 			setBreakdownData(result.result_data);
 			setBreakdownBaseProb(result.base_prob);
+			setShapDetails(result.shap);
+			setBoo(result.boo);
 
 			setHaveReturn(true)
 
@@ -201,6 +171,12 @@ export default function UrlChecker() {
 					</Box>
 				)
 			} */}
+
+			
+			<Typography>{boo}</Typography>
+			<Typography>{typeof(shapDetails)}</Typography>
+			{/* <Typography>{shapDetails.values.shape}</Typography> */}
+			{/* <Typography>{typeof(shapDetails[0])}</Typography> */}
 			
 			{haveReturn && !error &&(
 					<ResultDisplay
@@ -215,13 +191,7 @@ export default function UrlChecker() {
 
 			<Paper>
 				<Typography>Test Pie Chart</Typography>
-				<DonutChart
-				/>
-				{/* 
-				data = urls
-				width = 
-				height = 
-				 */}	
+				<DonutChart/>	
 			</Paper>
 					
 		</Container>

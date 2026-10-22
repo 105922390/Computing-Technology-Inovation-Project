@@ -1,41 +1,71 @@
 import { Box, Typography } from '@mui/material';
-import { BarChart } from '@mui/x-charts/BarChart';
+import { BarChart, BarLabel } from '@mui/x-charts/BarChart';
 
-export default function ContributionWaterfallGraph({data, startProb}) {
-  
+function FormatWaterfallData(data, startProb){
   const keys = Object.keys(data)
 
   // Extract data into a useable dataset for chart
   // Makes multiple singe element series, so each bar colour can be controlled independently
   var displaySeries = [];
-  var contrib = 0;
-  var col = null;
-  var currentTotal = Math.round(startProb*100)
+  var currentTotal = Math.round(startProb*10000)/100
+  var othersTotal = 0
   keys.forEach(feature => {
-    contrib = Math.round(data[feature]['contribution']*100)
-    if (contrib != 0){
+    const contrib = Math.round(data[feature]['contribution']*10000)/100
+    const posSign = contrib >= 0 ? true : false
+    if (Math.abs(contrib) >= 2){
 
-      col = ((contrib > 0) ? '#d21919' : '#3bd219')
+      const col = (posSign ? '#d21919' : '#3bd219')
       // add potential clear fill bar for this feature
       displaySeries.push({
-        data: [contrib > 0 ? currentTotal : (currentTotal+contrib)],
+        data: [posSign ? currentTotal : (currentTotal+contrib)],
         // label: null,
         stack: feature,
         color: 'transparent',
         valueFormatter: () => null
       })
       // add bar for this feature
+
       displaySeries.push({
         data: [Math.abs(contrib)],
-        tooltip: contrib != 0 ? feature : null,
+        label: contrib != 0 ? feature : null,
         stack: feature,
         color: col,
-        valueFormatter: (contrib) =>
-          `${contrib > 0 ? "+":""}${contrib} contribution`
+        valueFormatter: () => {
+          return `${posSign ? "+" : ""}${contrib}%`
+        }
       })
       currentTotal += contrib
+    } else {
+      othersTotal += contrib
     }
   });
+
+  othersTotal = Math.round(othersTotal*100)/100
+  var col = (othersTotal > 0 ? '#d21919' : '#3bd219')
+  displaySeries.push({
+        data: [othersTotal > 0 ? currentTotal : (currentTotal+othersTotal)],
+        stack: 'others',
+        color: 'transparent',
+        valueFormatter: () => null
+      })
+      // add bar for this feature
+
+      displaySeries.push({
+        data: [Math.abs(othersTotal)],
+        label: othersTotal != 0 ? 'others' : null,
+        stack: 'others',
+        color: col,
+        valueFormatter: () => {
+          return `${othersTotal > 0 ? "+" : ""}${othersTotal}%`
+        }
+      })
+
+  return displaySeries
+}
+
+export default function ContributionWaterfallGraph({data, startProb, is_phish}) {
+  
+  var displaySeries = FormatWaterfallData(data, startProb)
         
   return (
     <Box
@@ -61,6 +91,7 @@ export default function ContributionWaterfallGraph({data, startProb}) {
           max: 100,
         }]}
         layout = 'horizontal'
+        hideLegend = {true}
         slotProps={{
           bar: {
             rx: 3,
@@ -74,6 +105,7 @@ export default function ContributionWaterfallGraph({data, startProb}) {
           '& .MuiChartsAxis-left': {
             display: 'none',
           }
+          
         }}
         margin={{left:0}}
       />
