@@ -124,32 +124,29 @@ export default function UrlChecker() {
 	const [breakdownBaseProb, setBreakdownBaseProb] = useState(false);
 
 	// History
-	const [history, setHistory] = useState([])
+	const [history, setHistory] = useState([]);
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();
 		
 		setError(null);
 		setLoading(true);
-
-		// setPredictedSafety(null);
-		// setConfidence(null);
-		// setBreakdownData(null);
+		setHaveReturn(false);
 
 		try {
 			// Axios call to backend, ask predicted saftey of provided url
-			const result = await fetchPrediction(url)
-			console.log("got return")
-			setError(result.error)
+			const result = await fetchPrediction(url);
+			console.log("got return");
+			setError(result.error);
 			setPredictedSafety(result.is_phish);
 			setConfidence(result.confidence);
 			setTrustScore(result.trust_score);
 			setBreakdownData(result.result_data);
 			setBreakdownBaseProb(result.base_prob);
 
-			setHaveReturn(true)
+			setHaveReturn(true);
 
-			setHistory([new UrlData(url, predictedSafety, confidence)])
+			setHistory([new UrlData(url, predictedSafety, confidence)]);
 		} catch (error) {
 			setError('Error analysing url. Please try again. | ' + error);
 			console.error(error);
@@ -193,20 +190,8 @@ export default function UrlChecker() {
 					)
 				)
 			}
-
-			{/* /Debug what is in data/ */}
-			{/* <Typography>type of returned data:{typeof(breakdownData)}</Typography>
-			{
-				Object.keys(breakdownData).map((feature) =>
-					<Box>
-						<Typography>feat type: {typeof(feature)} feat: {feature}</Typography>
-						<Typography>val type: {typeof(breakdownData[feature])}</Typography>
-						<Typography>value: {breakdownData[feature]['value']} contribution: {breakdownData[feature]['contribution']}</Typography>
-					</Box>
-				)
-			} */}
 			
-			{haveReturn && !error &&(
+			{(haveReturn && !error) &&(
 					<ResultDisplay
 					is_phish = {predictedSafety}
 					confidence = {confidence}

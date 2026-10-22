@@ -91,6 +91,7 @@ def predict_url(url):
     #                                         [1]
 
     return {
+        "error": None,
         "confidence": confidence, 
         "trust_score": trust, 
         "is_phish": verdict,
