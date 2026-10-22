@@ -1,4 +1,5 @@
 import { Box, Typography } from '@mui/material';
+import { useDrawingArea } from '@mui/x-charts';
 import { BarChart, BarLabel } from '@mui/x-charts/BarChart';
 
 function FormatWaterfallData(data, startProb){
@@ -28,11 +29,16 @@ function FormatWaterfallData(data, startProb){
       displaySeries.push({
         data: [Math.abs(contrib)],
         label: contrib != 0 ? feature : null,
+        barLabelPlacement: 'outside',
         stack: feature,
         color: col,
         valueFormatter: () => {
           return `${posSign ? "+" : ""}${contrib}%`
-        }
+        },
+        barLabel: (item) => {
+        return `${posSign ? "+" : "-"}${item.value}`},
+        //alternate with feature label (disabled because too long)
+        // return `${feature}: ${posSign ? "+" : "-"}${item.value}`},
       })
       currentTotal += contrib
     } else {
@@ -53,11 +59,15 @@ function FormatWaterfallData(data, startProb){
       displaySeries.push({
         data: [Math.abs(othersTotal)],
         label: othersTotal != 0 ? 'others' : null,
+        barLabelPlacement: 'outside',
         stack: 'others',
         color: col,
         valueFormatter: () => {
           return `${othersTotal > 0 ? "+" : ""}${othersTotal}%`
-        }
+        },
+        barLabel: (item) => {
+        // const label = context.bar.series.xAxis?.data?.[item.dataIndex];
+        return `${'others'}: ${item.value}`},
       })
 
   return displaySeries
@@ -66,7 +76,7 @@ function FormatWaterfallData(data, startProb){
 export default function ContributionWaterfallGraph({data, startProb, is_phish}) {
   
   var displaySeries = FormatWaterfallData(data, startProb)
-        
+
   return (
     <Box
       sx ={{
@@ -79,6 +89,8 @@ export default function ContributionWaterfallGraph({data, startProb, is_phish}) 
           writingMode: 'vertical-rl',
           transform: 'rotate(180deg)',
           mr: 0,
+          ml: 1,
+          mb: 5,
         }}>
         URL Features
       </Typography>
@@ -88,7 +100,8 @@ export default function ContributionWaterfallGraph({data, startProb, is_phish}) 
         xAxis={[{
           label: 'Probabilty URL is Malicious',
           min: 0,
-          max: 100,
+          max: 120, //+ Math.max(...barLabels.map(label => label.length)) * 2,
+          tickInterval: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
         }]}
         layout = 'horizontal'
         hideLegend = {true}
@@ -101,13 +114,15 @@ export default function ContributionWaterfallGraph({data, startProb, is_phish}) 
             trigger: 'item',
           },
         }}
+        overflow='visible'
         sx = {{
           '& .MuiChartsAxis-left': {
             display: 'none',
-          }
+          },
+          overflow: 'visible'
           
         }}
-        margin={{left:0}}
+        margin={{left:-40}}
       />
     </Box>
   );

@@ -40,10 +40,6 @@ function ResultDisplay({is_phish, confidence, data, trust, startProb}) {
 				<Typography>AI Confidence: {confidence}</Typography>
 				<Typography>Breakdown: </Typography>
 
-				
-				{/* <ShapWaterfall></ShapWaterfall> */}
-
-
 				<WaterfallChart
 				data = {data}
 				startProb = {startProb}
@@ -171,12 +167,6 @@ export default function UrlChecker() {
 					</Box>
 				)
 			} */}
-
-			
-			<Typography>{boo}</Typography>
-			<Typography>{typeof(shapDetails)}</Typography>
-			{/* <Typography>{shapDetails.values.shape}</Typography> */}
-			{/* <Typography>{typeof(shapDetails[0])}</Typography> */}
 			
 			{haveReturn && !error &&(
 					<ResultDisplay
