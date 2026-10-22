@@ -83,7 +83,7 @@ function FormatWaterfallData(data, startProb){
     },
     barLabel: () => {
     // const label = context.bar.series.xAxis?.data?.[item.dataIndex];
-    return `${Math.abs(othersTotal)}%`},
+    return `${othersTotal > 0 ? "+" : "-"}${Math.abs(othersTotal)}%`},
   })
 
   return [displaySeries, shownFeatures, otherFeatures]
