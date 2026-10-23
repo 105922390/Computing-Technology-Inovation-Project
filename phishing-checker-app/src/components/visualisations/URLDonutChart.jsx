@@ -6,7 +6,7 @@ import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import { useDrawingArea } from "@mui/x-charts/hooks";
 import { styled } from "@mui/material/styles";
-import { color } from "d3";
+import { schemeSet3 } from "d3";
 
 const catagories = ["length", "host", "path", "symbols", "words"];
 const features = 
@@ -56,7 +56,7 @@ function featureData(dataset) {
         label: item.label,
         value: item.value,
         percentage: item.value,
-        color: categoryColors[item.section]
+        // color: categoryColors[item.section]
     })
     } else {
       other += item.value
@@ -67,7 +67,7 @@ function featureData(dataset) {
     id: "other",
     label: "Other",
     value: other,
-    color: categoryColors.other,
+    // color: categoryColors.other,
     percentage: other,
   })
   return formatted;
@@ -94,7 +94,7 @@ function catagoryData(dataset) {
 // Smaller peices of the catagories
 function catagoryFeatureData(dataset, catagoryD){
   var formatted = []
-  var sorted = dataset
+  var sorted = [...dataset]
   .sort((a, b) => catagories.indexOf(a.section) - catagories.indexOf(b.section))
 
   var other = 0
@@ -211,6 +211,7 @@ export default function URLPie({dataset}) {
       <Box sx={{ display: "flex", justifyContent: "center", height: 400 }}>
         {view === "feature" ? (
           <PieChart
+            colors={schemeSet3}
             series={[
               {
                 innerRadius,
@@ -222,6 +223,7 @@ export default function URLPie({dataset}) {
                 highlightScope: { fade: "global", highlight: "item" },
                 highlighted: { additionalRadius: 2 },
                 cornerRadius: 6,
+                sortingValues: 'none',
               },
             ]}
             sx={{
