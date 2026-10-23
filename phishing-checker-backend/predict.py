@@ -77,9 +77,8 @@ def predict_url(url):
     probablility = model.predict_proba(df)[0]
     shap_details = explainer.shap_values(df)
 
-    trust = probablility[0] * 100, 2
+    phishProb = probablility[1] * 100, 2
     confidence = probablility[result] * 100, 2
-    verdict = True if result == 1 else False
 
     # Getting data oriented around a positive (phishing) result by using 1 (see annotation below)
     # So in later results display, contribution is towards likelyhood of phishing.
@@ -92,9 +91,8 @@ def predict_url(url):
 
     return {
         "error": None,
-        "confidence": confidence, 
-        "trust_score": trust, 
-        "is_phish": verdict,
+        "phish_prob": phishProb,
+        "confidence": confidence,
         "base_prob": base_prob,
         "result_data": resultData}
 

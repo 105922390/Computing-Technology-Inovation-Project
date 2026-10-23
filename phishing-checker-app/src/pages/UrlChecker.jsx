@@ -13,6 +13,7 @@ import WaterfallChart from "../components/visualisations/ContributionWaterfallGr
 import AboutFeature from "../components/FeatureDetails.jsx"
 
 import '../css/general.css'
+import { rgb } from 'd3';
 
 class UrlData {
   constructor(url, prediction, certainty) {
@@ -22,10 +23,11 @@ class UrlData {
   }
 }
 
-function ResultDisplay({is_phish, confidence, data, trust, startProb}) {
+function ResultDisplay({phishProb, confidence, data, startProb}) {
 	const [currentFeatureId, setCurrentFeatureId] = useState("")
 	const [others, setOthers] = useState("")
 	const [isOthers, setIsOthers] = useState("")
+	const p = phishProb[0]
 	
 	function onClickFeatureBar(featureId, others, isOthers, isTotal){
 		// console.log("click recived, feature:" + featureId)
@@ -38,30 +40,26 @@ function ResultDisplay({is_phish, confidence, data, trust, startProb}) {
 	
 	return(
 		<Box>
-			{/* /Debug what is in data/ */}
-			{/* <Typography>type of returned data:{typeof(data)}</Typography>
-			{
-				Object.keys(data).map((feature) =>
-					<Box>
-						<Typography>feat type: {typeof(feature)} feat: {feature}</Typography>
-						<Typography>val type: {typeof(data[feature])}</Typography>
-						<Typography>value: {data[feature]['value']} contribution: {data[feature]['contribution']}</Typography>
-					</Box>
-				)
-			} */}
-
 			<Paper className='page-section'>
-				
-				<Typography>Verdict: { is_phish == true ? "Not Safe" : is_phish == false ? "Safe" : "Error no result"}</Typography>
-				<Typography>Trust Score: {Math.round(trust[0]*100)/100}%</Typography>
+				<Typography variant='h4' style={{marginBottom:"2%"}}>{ p >= 60 ? "Not Safe" : p >= 40 ? "Caution" : "Safe"}</Typography>
+				<div
+				style={{
+					display:'flex',
+					flexDirection:'row',
+					columnGap:'2%',
+					// padding:5,
+				}}>
+					<Typography variant='h5'>{Math.round(p*100)/100}%</Typography>
+					<Typography style={{alignSelf:'flex-end'}}>Chance of Phishing</Typography>
+				</div>
 				<Typography>AI Confidence: {Math.round(confidence[0]*100)/100}%</Typography>
 				
 				{/* <Typography variant='body2' sx={{m: 2}}
 				>Key features identified in the URL</Typography> */}
 				
-				<Typography 
-				variant='h5' sx={{alignSelf: 'center'}}
-				>Prediction Breakdown</Typography>
+				{/* <Typography 
+				variant='h6' sx={{alignSelf: 'center'}}
+				>Prediction Breakdown</Typography> */}
 				<WaterfallChart
 				data = {data}
 				startProb = {startProb}
@@ -114,15 +112,14 @@ export default function UrlChecker() {
 	const [url, setUrl] = useState('');
 
 	// Results (UI state)
-	const [predictedSafety, setPredictedSafety] = useState(null); // string (want to change to bool)
+	const [phishProb, setPishProb] = useState(Number); // string (want to change to bool)
 	const [confidence, setConfidence] = useState(Number);
-	const [trustScore, setTrustScore] = useState(Number);
 	const [breakdownData, setBreakdownData] = useState({}); // array of strings (may want to change this to be more specific to each explain type)
+	const [haveReturn, setHaveReturn] = useState(false); // bool
 	
 	// Tool state values
 	const [error, setError] = useState(String); // string
 	const [loading, setLoading] = useState(false); // bool
-	const [haveReturn, setHaveReturn] = useState(false); // bool
 	const [breakdownBaseProb, setBreakdownBaseProb] = useState(false);
 
 	// History
@@ -140,15 +137,16 @@ export default function UrlChecker() {
 			const result = await fetchPrediction(url);
 			console.log("got return");
 			setError(result.error);
-			setPredictedSafety(result.is_phish);
-			setConfidence(result.confidence);
-			setTrustScore(result.trust_score);
-			setBreakdownData(result.result_data);
-			setBreakdownBaseProb(result.base_prob);
+
+			if (result.result_data != undefined){
+				setPishProb(result.phish_prob);
+				setConfidence(result.confidence);
+				setBreakdownData(result.result_data);
+				setBreakdownBaseProb(result.base_prob);
+				setHistory([new UrlData(url, phishProb, confidence)]);
+			}
 
 			setHaveReturn(true);
-
-			setHistory([new UrlData(url, predictedSafety, confidence)]);
 		} catch (error) {
 			setError('Error analysing url. Please try again. | ' + error);
 			console.error(error);
@@ -193,12 +191,11 @@ export default function UrlChecker() {
 				)
 			}
 			
-			{(haveReturn && !error) &&(
+			{(haveReturn) &&(
 					<ResultDisplay
-					is_phish = {predictedSafety}
+					phishProb = {phishProb}
 					confidence = {confidence}
 					data = {breakdownData}
-					trust = {trustScore}
 					startProb = {breakdownBaseProb}
 					/>
 				)
