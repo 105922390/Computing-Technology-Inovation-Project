@@ -25,11 +25,15 @@ class UrlData {
 function ResultDisplay({is_phish, confidence, data, trust, startProb}) {
 	const [currentFeatureId, setCurrentFeatureId] = useState("")
 	const [others, setOthers] = useState("")
+	const [isOthers, setIsOthers] = useState("")
 	
-	function onClickFeatureBar(featureId, others){
-		console.log("click recived, feature:" + featureId)
-		setCurrentFeatureId(featureId)
-		setOthers(others)
+	function onClickFeatureBar(featureId, others, isOthers, isTotal){
+		// console.log("click recived, feature:" + featureId)
+		if (!isTotal){
+			setCurrentFeatureId(featureId)
+			setOthers(others)
+			setIsOthers(isOthers)
+		}
 	}
 	
 	return(
@@ -65,7 +69,7 @@ function ResultDisplay({is_phish, confidence, data, trust, startProb}) {
 				/>
 			</Paper>
 
-			{(currentFeatureId == 'other')&&(
+			{isOthers&&(
 				<Typography variant='h5'>Other Features</Typography>
 			)}
 

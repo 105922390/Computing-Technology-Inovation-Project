@@ -29,22 +29,63 @@ function FormatWaterfallData(data, startProb){
     } else {
       otherFeatures.push(feature)
       othersTotal += contrib
-      console.log("others total" +othersTotal)
     }
   })
 
   othersTotal = (Math.round(othersTotal*100)/100)
-
   if (othersTotal >= 0){
-    dataset.push({feature: "Other Features", fill: currentTotal, pos: othersTotal, neg: 0, grey:0})
+    dataset.push({feature: "other", fill: currentTotal, pos: othersTotal, neg: 0, grey:0})
   } else{
-    dataset.push({feature: "Other Features", fill: (currentTotal+othersTotal), pos: 0, neg: Math.abs(othersTotal), grey:0})
+    dataset.push({feature: "other", fill: (currentTotal+othersTotal), pos: 0, neg: Math.abs(othersTotal), grey:0})
   }
-
   currentTotal = Math.round((currentTotal + othersTotal)*100)/100
   dataset.push({feature: "Total", fill: 0, pos: 0, neg: 0, grey:currentTotal})
 
   return [dataset, otherFeatures]
+}
+
+function getFeatureName(id){
+  switch (id){
+    case "has_ip":
+      return "IP Address"
+    case "has_at":
+      return "Has @"
+    case "has_port":
+      return "Uses Port Number"
+    case "suspicious_tld":
+      return "Suspicious TLD"
+    case "brand_not_in_domain":
+      return "Brand Mismatch"
+    case "suspicious_words":
+      return "Suspicious Words"
+    case "is_shortener":
+      return "Shortener"
+    case "num_hyphens_host":
+      return "Hyphens"
+    case "num_dots_host":
+      return "Dots"
+    case "url_length":
+      return "URL Length"
+    case "path_length":
+      return "Path Length"
+    case "host_length":
+      return "Host Length"
+    case "digit_ratio":
+      return "Digit Ratio"
+    case "num_digits":
+      return "Digits"
+    case "num_special":
+      return "Special Char"
+    case "path_depth":
+        return "Path Depth"
+    case "host_entropy":
+      return "Host Entropy"
+    case "has_encoding":
+      return "Encoding"
+    case "other":
+      return "Other Features"
+  }
+  return id
 }
 
 function valueFormatter(value) {
@@ -68,9 +109,10 @@ export default function ContributionWaterfallGraph({data, startProb, onClickBar}
       <BarChart
         dataset={dataset}
         series={[
-          {dataKey: 'fill', stack: 'stack', color: 'transparent', valueFormatter: () => null},
+          {dataKey: 'fill', id: 'fill', stack: 'stack', color: 'transparent', valueFormatter: () => null},
           {
-            dataKey: 'pos', 
+            dataKey: 'pos',
+            id: 'feature_pos',
             stack: 'stack', 
             color: '#d21919',
             barLabelPlacement: 'outside',
@@ -85,7 +127,8 @@ export default function ContributionWaterfallGraph({data, startProb, onClickBar}
               return item.value != 0 ? `+${item.value}%` : null},
           },
           {
-            dataKey: 'neg', 
+            dataKey: 'neg',
+            id: 'feature_neg',
             stack: 'stack', 
             color: '#3bd219',
             barLabelPlacement: 'outside',
@@ -101,6 +144,7 @@ export default function ContributionWaterfallGraph({data, startProb, onClickBar}
           },
           {
             dataKey: 'grey', 
+            id: 'grey', 
             stack: 'stack', 
             color: '#868686',
             barLabelPlacement: 'outside',
@@ -126,6 +170,9 @@ export default function ContributionWaterfallGraph({data, startProb, onClickBar}
           dataKey: 'feature',
           label: "URL Features",
           width: 120,
+          valueFormatter: (value) => {
+            return getFeatureName(value);
+          },
         }]}
         layout = 'horizontal'
         hideLegend = {true}
@@ -144,8 +191,17 @@ export default function ContributionWaterfallGraph({data, startProb, onClickBar}
         }}
         overflow='visible'
         onItemClick={(event, item) => {
-          console.log("clicked: " + item)
-          onClickBar(item.seriesId, otherFeatures)
+          console.log("clicked: " + dataset[item.dataIndex].feature + "| seriesId: " + item.seriesId + "| dataIndex: " + item.dataIndex)
+          if (item.seriesId != 'fill'){
+            if (item.seriesId == 'grey'){
+              onClickBar(dataset[item.dataIndex].feature, otherFeatures, false, true)
+            }
+            else{
+              var other = false
+              if (dataset[item.dataIndex].feature == "other"){ other = true }
+              onClickBar(dataset[item.dataIndex].feature, otherFeatures, other, false)
+            }
+          }
         }}
       >
         <ChartsAxisHighlightValue
