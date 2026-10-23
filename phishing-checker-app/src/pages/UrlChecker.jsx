@@ -204,7 +204,7 @@ export default function UrlChecker() {
 			<aside className='aside-info'>
 				<Paper>
 					<Typography>Test Pie Chart</Typography>
-					<DonutChart/>	
+					{/* <DonutChart/>	 */}
 				</Paper>
 			</aside>
 					

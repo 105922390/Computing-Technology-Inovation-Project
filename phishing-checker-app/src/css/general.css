@@ -30,6 +30,14 @@ aside{
     border-radius: 10px;
 }
 
+.chart-title{
+    align-self: center;
+}
+
+.chart-description{
+    margin: 0;
+}
+
 @media (max-width: 1000px) {
     aside{
         /* flex-direction: column; */
