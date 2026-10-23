@@ -6,7 +6,6 @@ import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import { useDrawingArea } from "@mui/x-charts/hooks";
 import { styled } from "@mui/material/styles";
-import { schemeSet3 } from "d3";
 
 const catagories = ["length", "host", "path", "symbols", "words"];
 const features = 
@@ -43,6 +42,19 @@ const categoryColors = {
   "words": "#d397ff",
   "other": "#ff91e7",
 };
+
+const featurePalette = [
+  "#a7fffc",
+  "#7af6ff",
+  "#84e6ff",
+  "#6fd4ff",
+  "#6dc7ff",
+  "#ff9d6c",
+  "#ffbd84",
+  "#ffd284",
+  "#fffd90",
+  "#dfff8d",
+]
 
 function featureData(dataset) {
   var other = 0
@@ -211,7 +223,7 @@ export default function URLPie({dataset}) {
       <Box sx={{ display: "flex", justifyContent: "center", height: 400 }}>
         {view === "feature" ? (
           <PieChart
-            colors={schemeSet3}
+            colors={featurePalette}
             series={[
               {
                 innerRadius,
