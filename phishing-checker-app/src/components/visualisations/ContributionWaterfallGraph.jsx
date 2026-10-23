@@ -1,92 +1,50 @@
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import { ChartsAxisHighlightValue } from '@mui/x-charts';
 import { BarChart } from '@mui/x-charts/BarChart';
 
 function FormatWaterfallData(data, startProb){
   const keys = Object.keys(data)
 
-  // Extract data into a useable dataset for chart
-  // Makes multiple singe element series, so each bar colour can be controlled independently
-  var displaySeries = [];
   var currentTotal = Math.round(startProb*10000)/100
   var othersTotal = 0
-  var shownFeatures = []
   var otherFeatures = []
+  var dataset = []
+  dataset.push({feature: "Starting Probability", fill: 0, pos: 0, neg: 0, grey:currentTotal})
+
   keys.forEach(feature => {
     const contrib = Math.round(data[feature]['contribution']*10000)/100
-    const posSign = contrib >= 0 ? true : false
     if (Math.abs(contrib) >= 2){
-
-      const col = (posSign ? '#d21919' : '#3bd219')
-      // add potential clear fill bar for this feature
-      displaySeries.push({
-        data: [posSign ? currentTotal : (currentTotal+contrib)],
-        // label: null,
-        stack: feature,
-        color: 'transparent',
-        valueFormatter: () => null
-      })
-      // add bar for this feature
-
-      displaySeries.push({
-        data: [Math.abs(contrib)],
-        label: contrib != 0 ? feature : null,
-        id: feature,
-        barLabelPlacement: 'outside',
-        stack: feature,
-        color: col,
-        minBarSize: 10,
-        highlightScope:{
-          highlight: 'item',
-          fade: 'global'
-        },
-        valueFormatter: () => {
-          return `${posSign ? "+" : ""}${contrib}%`
-        },
-        barLabel: (item) => {
-        return `${posSign ? "+" : "-"}${item.value}%`},
-        //alternate with feature label (disabled because too long)
-        // return `${feature}: ${posSign ? "+" : "-"}${item.value}`},
-      })
-      shownFeatures.push(feature)
+      var blank
+      var minus = 0
+      var plus = 0
+      if(contrib <= 0){
+        minus = Math.abs(contrib)
+        blank = currentTotal+contrib
+      } else {
+        plus = Math.abs(contrib)
+        blank = currentTotal
+      }
+      dataset.push({feature: feature, fill: blank, pos: plus, neg: minus, grey:0})
       currentTotal += contrib
     } else {
       otherFeatures.push(feature)
       othersTotal += contrib
+      console.log("others total" +othersTotal)
     }
-  });
-
-  othersTotal = Math.round(othersTotal*100)/100
-  var col = (othersTotal > 0 ? '#d21919' : '#3bd219')
-  // Transparent bar
-  displaySeries.push({
-    data: [othersTotal > 0 ? currentTotal : (currentTotal+othersTotal)],
-    stack: 'others',
-    color: 'transparent',
-    valueFormatter: () => null
   })
 
-  // Other features summed into this bar
-  displaySeries.push({
-    data: [Math.abs(othersTotal) > 0.5 ? Math.abs(othersTotal) : 1],
-    label: othersTotal != 0 ? 'Other Features' : null,
-    id: 'other',
-    barLabelPlacement: 'outside',
-    stack: 'others',
-    color: col,
-    highlightScope:{
-      highlight: 'item',
-      fade: 'global'
-    },
-    valueFormatter: () => {
-      return `${othersTotal > 0 ? "+" : ""}${othersTotal}%`
-    },
-    barLabel: () => {
-    // const label = context.bar.series.xAxis?.data?.[item.dataIndex];
-    return `${othersTotal > 0 ? "+" : "-"}${Math.abs(othersTotal)}%`},
-  })
+  othersTotal = (Math.round(othersTotal*100)/100)
 
-  return [displaySeries, shownFeatures, otherFeatures]
+  if (othersTotal >= 0){
+    dataset.push({feature: "Other Features", fill: currentTotal, pos: othersTotal, neg: 0, grey:0})
+  } else{
+    dataset.push({feature: "Other Features", fill: (currentTotal+othersTotal), pos: 0, neg: Math.abs(othersTotal), grey:0})
+  }
+
+  currentTotal = Math.round((currentTotal + othersTotal)*100)/100
+  dataset.push({feature: "Total", fill: 0, pos: 0, neg: 0, grey:currentTotal})
+
+  return [dataset, otherFeatures]
 }
 
 function valueFormatter(value) {
@@ -97,8 +55,8 @@ function valueFormatter(value) {
 }
 
 export default function ContributionWaterfallGraph({data, startProb, onClickBar}) {
-  
-  const [displaySeries, shownFeatures, otherFeatures] = FormatWaterfallData(data, startProb)  
+
+  const [dataset, otherFeatures] = FormatWaterfallData(data, startProb)  
 
   return (
     <Box
@@ -107,24 +65,67 @@ export default function ContributionWaterfallGraph({data, startProb, onClickBar}
         alignItems: 'center',
       }}
     >
-      <Typography
-      sx={{
-          writingMode: 'vertical-rl',
-          transform: 'rotate(180deg)',
-          mr: 0,
-          ml: 1,
-          mb: 7,
-        }}>
-        URL Features
-      </Typography>
       <BarChart
-        series={displaySeries}
+        dataset={dataset}
+        series={[
+          {dataKey: 'fill', stack: 'stack', color: 'transparent', valueFormatter: () => null},
+          {
+            dataKey: 'pos', 
+            stack: 'stack', 
+            color: '#d21919',
+            barLabelPlacement: 'outside',
+            minBarSize: 2,
+            highlightScope:{
+              highlight: 'item',
+              fade: 'global'
+            },
+            valueFormatter: (value, {dataIndex}) => {
+              return value != 0 ? `${dataset[dataIndex].feature} +${value}%` : null},
+            barLabel: (item) => {
+              return item.value != 0 ? `+${item.value}%` : null},
+          },
+          {
+            dataKey: 'neg', 
+            stack: 'stack', 
+            color: '#3bd219',
+            barLabelPlacement: 'outside',
+            minBarSize: 2,
+            highlightScope:{
+              highlight: 'item',
+              fade: 'global'
+            },
+            valueFormatter: (value, {dataIndex}) => {
+              return value != 0 ? `${dataset[dataIndex].feature} -${value}%` : null},
+            barLabel: (item) => {
+              return item.value != 0 ? `-${item.value}%` : null},
+          },
+          {
+            dataKey: 'grey', 
+            stack: 'stack', 
+            color: '#868686',
+            barLabelPlacement: 'outside',
+            minBarSize: 2,
+            highlightScope:{
+              highlight: 'item',
+              fade: 'global'
+            },
+            valueFormatter: (value, {dataIndex}) => {
+              return value != 0 ? `${dataset[dataIndex].feature} +${value}%` : null},
+            barLabel: (item) => {
+              return item.value != 0 ? `${item.value}%` : null},
+          }
+        ]}
         height={300}
         xAxis={[{
           label: 'Probabilty URL is Malicious (%)',
           min: 0,
-          max: 120, //+ Math.max(...barLabels.map(label => label.length)) * 2,
+          max: 120,
           tickInterval: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+        }]}
+        yAxis={[{
+          dataKey: 'feature',
+          label: "URL Features",
+          width: 120,
         }]}
         layout = 'horizontal'
         hideLegend = {true}
@@ -142,17 +143,9 @@ export default function ContributionWaterfallGraph({data, startProb, onClickBar}
           },
         }}
         overflow='visible'
-        sx = {{
-          '& .MuiChartsAxis-left': {
-            display: 'none',
-          },
-          overflow: 'visible'
-          
-        }}
-        margin={{left:-40}}
         onItemClick={(event, item) => {
           console.log("clicked: " + item)
-          onClickBar(item.seriesId, shownFeatures, otherFeatures)
+          onClickBar(item.seriesId, otherFeatures)
         }}
       >
         <ChartsAxisHighlightValue

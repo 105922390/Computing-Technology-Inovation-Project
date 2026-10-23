@@ -24,13 +24,11 @@ class UrlData {
 
 function ResultDisplay({is_phish, confidence, data, trust, startProb}) {
 	const [currentFeatureId, setCurrentFeatureId] = useState("")
-	const [shown, setShown] = useState("")
 	const [others, setOthers] = useState("")
 	
-	function onClickFeatureBar(featureId, shown, others){
+	function onClickFeatureBar(featureId, others){
 		console.log("click recived, feature:" + featureId)
 		setCurrentFeatureId(featureId)
-		setShown(shown)
 		setOthers(others)
 	}
 	
