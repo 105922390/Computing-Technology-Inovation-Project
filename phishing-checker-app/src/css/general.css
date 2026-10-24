@@ -1,0 +1,42 @@
+aside{
+    /* float: right; */
+    background-color: green;
+}
+
+.page-section {
+    padding:20px;
+    margin-top:5px;
+    margin-bottom:5px;
+    display: flex;
+    flex-direction: column;
+    /* float: left; */
+}
+
+.feature-desc-container{
+    display: flex;
+    flex-direction: row;
+    /* justify-content: center; */
+    flex-wrap: wrap;
+    column-gap: 2%;
+}
+
+.feature-desc{
+    width: 48%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 10px;
+    /* border-color: black;/ */
+    border: 2px, solid, rgb(52, 85, 125);
+    border-radius: 10px;
+}
+
+@media (max-width: 1000px) {
+    aside{
+        /* flex-direction: column; */
+        /* float: none; */
+        background-color: brown;
+    }
+    .page-section{
+        float: none;
+    }
+}
