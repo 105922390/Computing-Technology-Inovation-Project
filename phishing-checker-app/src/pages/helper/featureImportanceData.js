@@ -1,0 +1,111 @@
+
+export const featureImportance = [
+    {
+        id: 'has_at',
+        value: 0.0001035442578247571,
+        label: 'Has At Symbol',
+        section: 'Host',
+    },
+    {
+        id: 'has_port',
+        value: 0.01840302053475708,
+        label: 'Uses Port Number',
+        section: 'Host',
+    },
+    {
+        id: 'has_encoding',
+        value: 0.3595389715148631,
+        label: 'Has Encoding',
+        section: 'Path',
+    },
+    {
+        id: 'is_shortener',
+        value: 0.4475799826955359,
+        label: 'Uses Shortener',
+        section: 'Host',
+    },
+    {
+        id: 'brand_not_in_domain',
+        value: 1.228087481722858,
+        label: 'Brand Not In Domain',
+        section: 'Host',
+    },
+    {
+        id: 'num_special',
+        value: 3.182251713451051,
+        label: 'Special Characters',
+        section: 'Symbols',
+    },
+    {
+        id: 'suspicious_tld',
+        value: 3.385918786299235,
+        label: 'TLD',
+        section: 'Words',
+    },
+    {
+        id: 'has_ip',
+        value: 4.27283556187476,
+        label: 'IP Address',
+        section: 'Host',
+    },
+    {
+        id: 'suspicious_Words',
+        value: 5.724838665774835,
+        label: 'Keywords',
+        section: 'Words',
+    },
+    {
+        id: 'num_hyphens_Host',
+        value: 6.94187492052126,
+        label: 'Hyphens In Host',
+        section: 'Host',
+    },
+    {
+        id: 'num_digits',
+        value: 7.992268545374293,
+        label: 'Digits',
+        section: 'Symbols',
+    },
+    {
+        id: 'url_Length',
+        value: 8.04323181709766,
+        label: 'URL Length',
+        section: 'Length',
+    },
+    {
+        id: 'Host_entropy',
+        value: 8.059334350473815,
+        label: 'Host Entropy',
+        section: 'Host',
+    },
+    {
+        id: 'Host_Length',
+        value: 8.125989549116937,
+        label: 'Host Length',
+        section: 'Length',
+    },
+    {
+        id: 'Path_depth',
+        value: 8.32097566333227,
+        label: 'Path Depth',
+        section: 'Path',
+    },
+    {
+        id: 'digit_ratio',
+        value: 8.587043942502266,
+        label: 'Digit Ratio',
+        section: 'Symbols',
+    },
+    {
+        id: 'Path_Length',
+        value: 10.31307746142232,
+        label: 'Path Length',
+        section: 'Length',
+    },
+    {
+        id: 'num_dots_Host',
+        value: 14.99664602203346,
+        label: 'Dots in Host',
+        section: 'Host',
+    },
+]
