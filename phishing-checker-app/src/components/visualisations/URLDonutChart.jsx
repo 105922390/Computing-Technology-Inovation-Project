@@ -7,7 +7,7 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import { useDrawingArea } from "@mui/x-charts/hooks";
 import { styled } from "@mui/material/styles";
 
-const catagories = ["length", "host", "path", "symbols", "words"];
+const catagories = ["Length", "Host", "Path", "Symbols", "Words"];
 const features = 
 [
   "has_at",
@@ -35,25 +35,25 @@ const minPercentSmall = 1;
 
 // Define colors for each class
 const categoryColors = {
-  "length": "#fa938e",
-  "host": "#fae18e",
-  "path": "#98bf45",
-  "symbols": "#51cbcf",
-  "words": "#d397ff",
-  "other": "#ff91e7",
+  "Length": "#fa938e",
+  "Host": "#f0ce5f",
+  "Path": "#98bf45",
+  "Symbols": "#51cbcf",
+  "Words": "#d397ff",
+  "Other": "#ff91e7",
 };
 
 const featurePalette = [
-  "#a7fffc",
-  "#7af6ff",
-  "#84e6ff",
-  "#6fd4ff",
-  "#6dc7ff",
+  "#4aed90",
+  "#50efc7",
+  "#3ce8eb",
+  "#4cc9ff",
+  "#63a9ff",
   "#ff9d6c",
-  "#ffbd84",
-  "#ffd284",
-  "#fffd90",
-  "#dfff8d",
+  "#ffbe5d",
+  "#ffde5c",
+  "#e5e233",
+  "#b3e438",
 ]
 
 function featureData(dataset) {
@@ -120,7 +120,7 @@ function catagoryFeatureData(dataset, catagoryD){
       if (otherList.length == 1){
         formatted.push({
         id: otherList[0],
-        label: otherList[0],
+        label: dataset.find((d) => d.id == otherList[0]).label,
         value: other,
         color: categoryColors[sorted[i-1].section],
         percentage: other >= 1 ? other : 0.5,
@@ -141,7 +141,7 @@ function catagoryFeatureData(dataset, catagoryD){
     if (item.value > minPercentSmall){
       formatted.push({
       id: `${item.label}`,//-${item.section}`,
-      label: `${item.label}: `,
+      label: `${item.label} `,
       value: item.value,
       percentage:
         (item.value / cat.value) * 100,
@@ -156,7 +156,7 @@ function catagoryFeatureData(dataset, catagoryD){
     if (otherList.length == 1){
         formatted.push({
         id: otherList[0],
-        label: otherList[0],
+        label: dataset.find((d) => d.id == otherList[0]).label,
         value: other,
         color: categoryColors[sorted[i-1].section],
         percentage: other >= 1 ? other : 0.5,
@@ -191,7 +191,7 @@ function PieCenterLabel({ children }) {
 }
 
 export default function URLPie({dataset}) {
-  const [view, setView] = React.useState("class");
+  const [view, setView] = React.useState("feature");
   const handleViewChange = (event, newView) => {
     if (newView !== null) {
       setView(newView);
@@ -199,7 +199,7 @@ export default function URLPie({dataset}) {
   };
 
   const innerRadius = 50;
-  const middleRadius = 120;
+  const middleRadius = 150;
 
   const featureD = featureData(dataset)
   const catagoryD = catagoryData(dataset)
@@ -227,7 +227,7 @@ export default function URLPie({dataset}) {
             series={[
               {
                 innerRadius,
-                outerRadius: middleRadius+innerRadius,
+                outerRadius: middleRadius+30,
                 data: featureD,
                 arcLabel: (item) => `${item.label} (${item.percentage.toFixed(0)}%)`,
                 valueFormatter: ({ value }) =>
@@ -235,12 +235,13 @@ export default function URLPie({dataset}) {
                 highlightScope: { fade: "global", highlight: "item" },
                 highlighted: { additionalRadius: 2 },
                 cornerRadius: 6,
-                sortingValues: 'none',
+                sortingValues: "none",
+                arcLabelRadius: "60%",
               },
             ]}
             sx={{
               [`& .${pieClasses.arcLabel}`]: {
-                fontSize: "10px",
+                fontSize: "12px",
               },
             }}
             hideLegend
@@ -260,17 +261,17 @@ export default function URLPie({dataset}) {
                 highlightScope: { fade: "global", highlight: "item" },
                 highlighted: { additionalRadius: 2 },
                 cornerRadius: 3,
+                arcLabelRadius: "45%",
               },
               {
                 innerRadius: middleRadius,
-                outerRadius: middleRadius + 20,
+                outerRadius: middleRadius + 30,
                 data: categoryFeatureD,
                 arcLabel: (item) => {
                   const id = item.label || "";
-                  const percentage = item.percentage || 0;
-                  return `${id.split("-")[0]} (${percentage.toFixed(0)}%)`;
+                  return `${id.split("-")[0]}`;
                 },
-                arcLabelRadius: 160,
+                arcLabelRadius: "90%",
                 valueFormatter: ({ value }) =>
                   `${value.toFixed(3)}%`,
                 highlightScope: { fade: "global", highlight: "item" },
@@ -280,7 +281,7 @@ export default function URLPie({dataset}) {
             ]}
             sx={{
               [`& .${pieClasses.arcLabel}`]: {
-                fontSize: "10px",
+                fontSize: "12px",
               },
             }}
             hideLegend
