@@ -128,7 +128,7 @@ function catagoryFeatureData(dataset, catagoryD){
       } else {
         formatted.push({
         id: "other",
-        label: `Other ${item.section}`,
+        label: `Other`,
         value: other,
         color: categoryColors[currentCat],
         percentage: other,
@@ -164,7 +164,7 @@ function catagoryFeatureData(dataset, catagoryD){
       } else {
         formatted.push({
         id: "other",
-        label: `Other words`,
+        label: `Other`,
         value: other,
         color: categoryColors[currentCat],
         percentage: other,
