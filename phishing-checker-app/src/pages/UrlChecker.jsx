@@ -8,12 +8,12 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import DonutChart from "../components/visualisations/URLDonutChart.jsx";
+// import DonutChart from "../components/visualisations/URLDonutChart.jsx";
 import WaterfallChart from "../components/visualisations/ContributionWaterfallGraph.jsx";
 import AboutFeature from "../components/FeatureDetails.jsx"
 
 import '../css/general.css'
-import { rgb } from 'd3';
+
 
 class UrlData {
   constructor(url, prediction, certainty) {

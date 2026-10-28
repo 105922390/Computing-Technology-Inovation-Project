@@ -13,6 +13,9 @@ import UnexpectedFailure from './pages/error_pages/UnexpectedFailure.jsx'
 // Components and layouts
 import MainLayout from './layouts/MainLayout.jsx'
 
+// General CSS
+import './css/style.css'
+
 
 // Route the pages
 function App({ themeMode, onToggleThemeMode }) {

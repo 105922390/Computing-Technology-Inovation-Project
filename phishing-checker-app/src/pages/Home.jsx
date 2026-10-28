@@ -12,15 +12,15 @@ export default function Home() {
 		<Box>
 			{/* Headings */}
 			<Container sx={{ textAlign: 'center' }}>
-				<Typography variant='h3' component='h1'>
+				<Typography variant='h3' component='h2'>
 					Site Name
 				</Typography>
 
 				<Typography variant='h1' component='h1'>
-					Browse Confidently
+					BROWSE CONFIDENTLY
 				</Typography>
 
-				<Typography variant='h5' component="h2">
+				<Typography variant='h5' component="h3">
 					Scan your links for phishing
 				</Typography>
 
