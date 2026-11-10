@@ -18,7 +18,7 @@ export default function UnexpectedFailure() {
 			</Typography>
 
 			<Typography variant='h5' component="h2" gutterBottom>
-				Site Name has experienced an unexpected failure.
+				PhishGuard has experienced an unexpected failure.
 			</Typography>
 		</Container>
 	);

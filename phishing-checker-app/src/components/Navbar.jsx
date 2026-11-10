@@ -14,15 +14,20 @@ function Navbar({ themeMode, onToggleThemeMode }) {
 		<AppBar position='static'>
 			<Toolbar>
 
-				<Box sx={{ flexGrow: 1 }}>
-					<Typography variant='h5' component={RouterLink} to="/" underline="hover"
-						sx={{
-							color: "inherit",
-							textDecoration: "none"
-						}}
+				<Box
+					component={RouterLink}
+					to="/"
+					sx={{
+						display: "flex",
+						alignItems: "center",
+						gap: 1,
+						flexGrow: 1,
+						color: "inherit",
+						textDecoration: "none",
+					}}
 					>
-						Site Name
-					</Typography>
+						<Box component="img" src="./logo.svg" alt="" sx={{ width: 32, height: 32 }} />
+						<Typography variant="h5">PhishGuard</Typography>
 				</Box>
 
 				<Tooltip title={themeMode === "light" ? "Switch to dark mode" : "Switch to light mode"} >

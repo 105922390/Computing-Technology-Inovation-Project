@@ -13,7 +13,7 @@ export default function Home() {
 			{/* Headings */}
 			<Container sx={{ textAlign: 'center' }}>
 				<Typography variant='h3' component='h2'>
-					Site Name
+					PhishGuard
 				</Typography>
 
 				<Typography variant='h1' component='h1'>
@@ -28,6 +28,7 @@ export default function Home() {
 				<Button
 					variant="contained"
 					size="large"
+					className="glow-button"
 					sx={{
 						m: 5,
 						fontSize: "2rem"
@@ -42,13 +43,11 @@ export default function Home() {
 			{/* "What is phishing" box */}
 			<Container
 				maxWidth="sm"
+				className="home-what-is-phishing"
 				sx={{
-					border: 5,
 					borderColor: 'divider',
-					borderRadius: 7,
 					bgcolor: 'background.paper',
 					color: 'text.primary',
-					p: 3
 				}}
 			>
 				<Typography variant="h5" component="h3">
@@ -96,7 +95,7 @@ export default function Home() {
 
 			<Container maxWidth="sm">
 				<Typography variant="p" component="p">
-					<strong>Site Name</strong> scans links for suspicious features using a specially trained AI model.
+					<strong>PhishGuard</strong> scans links for suspicious features using a specially trained AI model.
 				</Typography>
 				
 

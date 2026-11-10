@@ -4,10 +4,12 @@ import {
 	TextField,
 	Button,
 	Paper,
-	Box
+	Box,
+	useTheme,
 } from '@mui/material';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { PieChart } from '@mui/x-charts/PieChart';
 // import DonutChart from "../components/visualisations/URLDonutChart.jsx";
 import WaterfallChart from "../components/visualisations/ContributionWaterfallGraph.jsx";
 import AboutFeature from "../components/FeatureDetails.jsx"
@@ -23,11 +25,78 @@ class UrlData {
   }
 }
 
+function ConfidenceRing({status, statusClass, confidence}) {
+    const theme = useTheme();
+    const confidencePercent = Math.min(100, Math.max(0, confidence));
+    const isDarkMode = theme.palette.mode === 'dark';
+    const tone = status === 'Safe'
+        ? theme.palette.confidenceRing.safe
+        : status === 'Caution'
+            ? theme.palette.confidenceRing.caution
+            : theme.palette.confidenceRing.unsafe;
+    // const trackColor = isDarkMode ? '#30394c' : '#e8edf3';
+    const confidenceLabel = `${Math.round(confidencePercent * 100) / 100}%`;
+
+    return (
+        <Box
+            className='url-checker-confidence'
+            role='img'
+			aria-label={`${status} evaluation, ${confidenceLabel} model confidence`}
+			
+        >
+            <PieChart
+                className='url-checker-confidence-chart'
+                width={260}
+                height={260}
+                series={[{
+                    data: [
+                        { id: 'confidence', value: confidencePercent },
+                        { id: 'remaining', value: 100 - confidencePercent },
+                    ],
+                    innerRadius: 88,
+                    outerRadius: 104,
+                    startAngle: 0,
+                    endAngle: 360,
+                    cornerRadius: 8,
+                    paddingAngle: 0,
+                    sortingValues: 'none',
+                }]}
+                colors={[tone.ring, theme.palette.confidenceRing.trackColour]}
+				margin={0}
+                hideLegend
+                aria-hidden
+            />
+            <Box className='url-checker-confidence-label'>
+                <Typography
+                    variant='h6'
+                    className={`url-checker-confidence-status ${statusClass}`}
+                    sx={{ color: tone.text }}
+                >
+                    {status}
+                </Typography>
+                <Typography
+                    variant='h3'
+                    className='url-checker-confidence-value'
+                    sx={{ color: tone.text }}
+                >
+                    {confidenceLabel}
+                </Typography>
+                <Typography variant='body2' className='url-checker-confidence-caption'>
+                    confidence
+                </Typography>
+            </Box>
+        </Box>
+    );
+}
+
 function ResultDisplay({phishProb, confidence, data, startProb}) {
-	const [currentFeatureId, setCurrentFeatureId] = useState("")
-	const [others, setOthers] = useState("")
-	const [isOthers, setIsOthers] = useState("")
-	const p = phishProb[0]
+    const [currentFeatureId, setCurrentFeatureId] = useState("")
+    const [others, setOthers] = useState("")
+    const [isOthers, setIsOthers] = useState("")
+    const p = phishProb[0]
+    const confidencePercent = confidence[0]
+    const status = p >= 60 ? "Not Safe" : p >= 40 ? "Caution" : "Safe";
+    const statusTone = p >= 60 ? "unsafe" : p >= 40 ? "caution" : "safe";
 	
 	function onClickFeatureBar(featureId, others, isOthers, isTotal){
 		// console.log("click recived, feature:" + featureId)
@@ -40,31 +109,37 @@ function ResultDisplay({phishProb, confidence, data, startProb}) {
 	
 	return(
 		<Box>
-			<Paper className='page-section'>
-				<Typography variant='h4' style={{marginBottom:"2%"}}>{ p >= 60 ? "Not Safe" : p >= 40 ? "Caution" : "Safe"}</Typography>
-				<div
-				style={{
-					display:'flex',
-					flexDirection:'row',
-					columnGap:'2%',
-					// padding:5,
-				}}>
-					<Typography variant='h5'>{Math.round(p*100)/100}%</Typography>
-					<Typography style={{alignSelf:'flex-end'}}>Chance of Phishing</Typography>
-				</div>
-				<Typography>AI Confidence: {Math.round(confidence[0]*100)/100}%</Typography>
+			<ConfidenceRing
+					status={status}
+					statusClass={`url-checker-status--${statusTone}`}
+					confidence={confidencePercent}
+				/>
+			<Paper className='page-section url-checker-result'>
+				
+
+				<Box className='url-checker-metric url-checker-risk-metric'>
+					<Typography variant='h4' className='url-checker-metric-value'>
+						{Math.round(p*100)/100}%
+					</Typography>
+					<Typography variant='body2' className='url-checker-metric-label'>
+						Chance of phishing
+					</Typography>
+				</Box>
 				
 				{/* <Typography variant='body2' sx={{m: 2}}
 				>Key features identified in the URL</Typography> */}
 				
-				{/* <Typography 
-				variant='h6' sx={{alignSelf: 'center'}}
-				>Prediction Breakdown</Typography> */}
-				<WaterfallChart
-				data = {data}
-				startProb = {startProb}
-				onClickBar = {onClickFeatureBar}
-				/>
+				<Typography 
+					variant='h5' sx={{ alignSelf: 'center'}}>
+					URL Features And Their Effect
+				</Typography>
+				<Box className='url-checker-chart'>
+					<WaterfallChart
+					data = {data}
+					startProb = {startProb}
+					onClickBar = {onClickFeatureBar}
+					/>
+				</Box>
 			</Paper>
 
 			{isOthers&&(
@@ -137,16 +212,17 @@ export default function UrlChecker() {
 			const result = await fetchPrediction(url);
 			console.log("got return");
 			setError(result.error);
-
+			console.log(result.result_data)
 			if (result.result_data != undefined){
 				setPishProb(result.phish_prob);
 				setConfidence(result.confidence);
 				setBreakdownData(result.result_data);
 				setBreakdownBaseProb(result.base_prob);
 				setHistory([new UrlData(url, phishProb, confidence)]);
+				setHaveReturn(true);
 			}
 
-			setHaveReturn(true);
+			
 		} catch (error) {
 			setError('Error analysing url. Please try again. | ' + error);
 			console.error(error);
@@ -157,39 +233,44 @@ export default function UrlChecker() {
 	
 
 	return (
-		<Container className='main-w-side'>
+		<Container className='main-w-side url-checker-page'>
 			<Typography variant='h2' component='h1' gutterBottom>
 				URL Checker
 			</Typography>
 
-			<Typography variant='h5' component="h2" gutterBottom>
-				Scan your URL
-			</Typography>
-			{/* <UrlInput /> */}
+			<Paper className='url-checker-hero'>
+				<Typography variant='h5' component="h2" className='url-checker-subtitle'>
+					Scan your URL
+				</Typography>
 
-			<form onSubmit={handleSubmit}>
-				<TextField
-				label="Enter URL"
-				value={url}
-				onChange={(event) => setUrl(event.target.value)}
-				placeholder='example.com'
-				/>
+				<form onSubmit={handleSubmit} className='url-checker-form'>
+					<TextField
+					label="Enter URL"
+					value={url}
+					onChange={(event) => setUrl(event.target.value)}
+					placeholder='example.com'
+					fullWidth
+					/>
 
-				<Button
-				type='submit'
-				>
-					Analyse
-				</Button>
-			</form>
+					<Button
+					type='submit'
+					variant='contained'
+						size='large'
+					className='glow-button'
+					>
+						Analyse
+					</Button>
+				</form>
 
-			{ loading? (
-					<Typography>Analysing URL...</Typography>
-				):(
-					error && (
-					<Typography>{error}</Typography>
+				{ loading? (
+						<Typography className='url-checker-feedback'>Analysing URL...</Typography>
+					):(
+						error && (
+						<Typography className='url-checker-feedback' color='error' role='alert'>{error}</Typography>
+						)
 					)
-				)
-			}
+				}
+			</Paper>
 			
 			{(haveReturn) &&(
 					<ResultDisplay
@@ -200,15 +281,7 @@ export default function UrlChecker() {
 					/>
 				)
 			}
-
-			<aside className='aside-info'>
-				<Paper>
-					<Typography>Test Pie Chart</Typography>
-					{/* <DonutChart/>	 */}
-				</Paper>
-			</aside>
 					
 		</Container>
 	);
 }
-

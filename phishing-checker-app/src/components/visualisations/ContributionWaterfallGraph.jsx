@@ -1,6 +1,7 @@
 import { Box } from '@mui/material';
 import { ChartsAxisHighlightValue } from '@mui/x-charts';
 import { BarChart } from '@mui/x-charts/BarChart';
+import { useTheme } from "@mui/material/styles";
 
 function FormatWaterfallData(data, startProb){
   const keys = Object.keys(data)
@@ -97,7 +98,8 @@ function valueFormatter(value) {
 
 export default function ContributionWaterfallGraph({data, startProb, onClickBar}) {
 
-  const [dataset, otherFeatures] = FormatWaterfallData(data, startProb)  
+	const [dataset, otherFeatures] = FormatWaterfallData(data, startProb)  
+ 	const theme = useTheme();
 
   return (
     <Box
@@ -114,7 +116,7 @@ export default function ContributionWaterfallGraph({data, startProb, onClickBar}
             dataKey: 'pos',
             id: 'feature_pos',
             stack: 'stack', 
-            color: '#d21919',
+            color: theme.palette.chart.negative,
             barLabelPlacement: 'outside',
             minBarSize: 2,
             highlightScope:{
@@ -130,7 +132,7 @@ export default function ContributionWaterfallGraph({data, startProb, onClickBar}
             dataKey: 'neg',
             id: 'feature_neg',
             stack: 'stack', 
-            color: '#3bd219',
+            color: theme.palette.chart.positive,
             barLabelPlacement: 'outside',
             minBarSize: 2,
             highlightScope:{
@@ -146,7 +148,7 @@ export default function ContributionWaterfallGraph({data, startProb, onClickBar}
             dataKey: 'grey', 
             id: 'grey', 
             stack: 'stack', 
-            color: '#868686',
+           color: theme.palette.chart.baseline,
             barLabelPlacement: 'outside',
             minBarSize: 2,
             highlightScope:{
