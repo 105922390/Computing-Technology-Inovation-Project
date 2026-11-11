@@ -13,16 +13,26 @@ import { PieChart } from '@mui/x-charts/PieChart';
 // import DonutChart from "../components/visualisations/URLDonutChart.jsx";
 import WaterfallChart from "../components/visualisations/ContributionWaterfallGraph.jsx";
 import AboutFeature from "../components/FeatureDetails.jsx"
+import HistoryAnalysisChart from "../components/visualisations/HistoryAnalysisChart.jsx"
 
 import '../css/general.css'
 
 
 class UrlData {
-  constructor(url, prediction, certainty) {
-    this.url = url;
-    this.prediction = prediction;
-    this.certainty = certainty;
-  }
+  	constructor(url, prediction, certainty, result) {
+   		this.url = url;
+    	this.prediction = prediction;
+	  	this.certainty = certainty;
+	  	this.result = result;
+  	}
+}
+
+function getStatusTone(phishingProbability) {
+	return phishingProbability >= 60
+		? "unsafe"
+		: phishingProbability >= 40
+			? "caution"
+			: "safe";
 }
 
 function ConfidenceRing({status, statusClass, confidence}) {
@@ -61,7 +71,8 @@ function ConfidenceRing({status, statusClass, confidence}) {
                 }]}
                 colors={[tone.ring, theme.palette.confidenceRing.trackColour]}
 				margin={0}
-                hideLegend
+				hideLegend
+				slotProps={{ tooltip: {trigger: 'none'}}}
                 aria-hidden
             />
             <Box className='url-checker-confidence-label'>
@@ -94,7 +105,7 @@ function ResultDisplay({phishProb, confidence, data, startProb}) {
     const p = phishProb[0]
     const confidencePercent = confidence[0]
     const status = p >= 60 ? "Not Safe" : p >= 40 ? "Caution" : "Safe";
-    const statusTone = p >= 60 ? "unsafe" : p >= 40 ? "caution" : "safe";
+    const statusTone = getStatusTone(p);
 	
 	function onClickFeatureBar(featureId, others, isOthers, isTotal){
 		// console.log("click recived, feature:" + featureId)
@@ -128,6 +139,10 @@ function ResultDisplay({phishProb, confidence, data, startProb}) {
 				<Typography 
 					variant='h5' sx={{ alignSelf: 'center'}}>
 					URL Features And Their Effect
+				</Typography>
+				<Typography 
+					variant='body2' sx={{ alignSelf: 'center', m:-2}}>
+					Click a bar to see more detail
 				</Typography>
 				<Box className='url-checker-chart'>
 					<WaterfallChart
@@ -174,7 +189,7 @@ async function fetchPrediction(inputUrl){
 } 
 
 
-export default function UrlChecker() {
+export default function UrlChecker({history, setHistory}) {
 	useEffect(() => {
 		document.title = 'URL Checker';
 	}, []);
@@ -194,7 +209,7 @@ export default function UrlChecker() {
 	const [breakdownBaseProb, setBreakdownBaseProb] = useState(false);
 
 	// History
-	const [history, setHistory] = useState([]);
+	
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();
@@ -214,7 +229,20 @@ export default function UrlChecker() {
 				setConfidence(result.confidence);
 				setBreakdownData(result.result_data);
 				setBreakdownBaseProb(result.base_prob);
-				setHistory([new UrlData(url, phishProb, confidence)]);
+
+				const statusTone = getStatusTone(result.phish_prob[0]);
+				const urlData = new UrlData(
+					url,
+					result.phish_prob,
+					result.confidence,
+					statusTone
+				);
+				// Only add an element to the history list if the url isn't already in there
+				setHistory((previousHistory) =>
+					previousHistory.some((entry) => entry.url.trim() === url.trim())
+						? previousHistory
+						: [...previousHistory, urlData]
+				);
 				setHaveReturn(true);
 			}
 
@@ -231,7 +259,7 @@ export default function UrlChecker() {
 	return (
 		<Container className='main-w-side url-checker-page'>
 			<Typography variant='h2' component='h1' gutterBottom>
-				URL Checker
+				PhishGuard URL Checker
 			</Typography>
 
 			<Paper className='url-checker-hero'>
@@ -268,13 +296,19 @@ export default function UrlChecker() {
 				}
 			</Paper>
 			
-			{(haveReturn) &&(
+			{(haveReturn) && (
+			<Container>
 					<ResultDisplay
 					phishProb = {phishProb}
 					confidence = {confidence}
 					data = {breakdownData}
 					startProb = {breakdownBaseProb}
 					/>
+					<HistoryAnalysisChart data={history}>
+
+					</HistoryAnalysisChart>
+				</Container>
+					
 				)
 			}
 					
