@@ -19,7 +19,7 @@ import './css/style.css'
 
 
 // Route the pages
-function App({ themeMode, onToggleThemeMode }) {
+function App({ themeMode, onToggleThemeMode, history, setHistory }) {
 	return (
 		<Suspense fallback={<p>Loading page…</p>}>
 			<Routes>
@@ -30,7 +30,7 @@ function App({ themeMode, onToggleThemeMode }) {
 					<Route path="/about-the-tool" element={<AboutTool />} />
 					<Route path="/about-phishing" element={<AboutPhishing />} />
 					<Route path="/help" element={<Help />} />
-					<Route path="/url-checker" element={<UrlChecker />} />
+					<Route path="/url-checker" element={<UrlChecker history={history} setHistory={setHistory} />} />
 					<Route path="/error-unexpected-failure" element={<UnexpectedFailure />} />
 					<Route path="*" element={<PageNotExist />} />
 				</Route>

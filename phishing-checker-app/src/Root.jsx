@@ -342,11 +342,13 @@ function Root() {
 		setThemeMode((current) => (current === "light" ? "dark" : "light"));
 	};
 
+	const [history, setHistory] = useState([]);
+
 	return (
 		<ThemeProvider theme={theme}>
 			<CssBaseline />
 			<BrowserRouter>
-				<App themeMode={themeMode} onToggleThemeMode={toggleThemeMode} />
+				<App themeMode={themeMode} onToggleThemeMode={toggleThemeMode} history={history} setHistory={ setHistory} />
 			</BrowserRouter>
 		</ThemeProvider>
 	);

@@ -140,6 +140,10 @@ function ResultDisplay({phishProb, confidence, data, startProb}) {
 					variant='h5' sx={{ alignSelf: 'center'}}>
 					URL Features And Their Effect
 				</Typography>
+				<Typography 
+					variant='body2' sx={{ alignSelf: 'center', m:-2}}>
+					Click a bar to see more detail
+				</Typography>
 				<Box className='url-checker-chart'>
 					<WaterfallChart
 					data = {data}
@@ -185,7 +189,7 @@ async function fetchPrediction(inputUrl){
 } 
 
 
-export default function UrlChecker() {
+export default function UrlChecker({history, setHistory}) {
 	useEffect(() => {
 		document.title = 'URL Checker';
 	}, []);
@@ -205,7 +209,7 @@ export default function UrlChecker() {
 	const [breakdownBaseProb, setBreakdownBaseProb] = useState(false);
 
 	// History
-	const [history, setHistory] = useState([]);
+	
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();
