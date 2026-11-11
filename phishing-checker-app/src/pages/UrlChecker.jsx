@@ -28,13 +28,11 @@ class UrlData {
 function ConfidenceRing({status, statusClass, confidence}) {
     const theme = useTheme();
     const confidencePercent = Math.min(100, Math.max(0, confidence));
-    const isDarkMode = theme.palette.mode === 'dark';
     const tone = status === 'Safe'
         ? theme.palette.confidenceRing.safe
         : status === 'Caution'
             ? theme.palette.confidenceRing.caution
             : theme.palette.confidenceRing.unsafe;
-    // const trackColor = isDarkMode ? '#30394c' : '#e8edf3';
     const confidenceLabel = `${Math.round(confidencePercent * 100) / 100}%`;
 
     return (
@@ -126,8 +124,6 @@ function ResultDisplay({phishProb, confidence, data, startProb}) {
 					</Typography>
 				</Box>
 				
-				{/* <Typography variant='body2' sx={{m: 2}}
-				>Key features identified in the URL</Typography> */}
 				
 				<Typography 
 					variant='h5' sx={{ alignSelf: 'center'}}>
