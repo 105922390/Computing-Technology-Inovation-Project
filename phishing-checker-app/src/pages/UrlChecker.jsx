@@ -71,7 +71,8 @@ function ConfidenceRing({status, statusClass, confidence}) {
                 }]}
                 colors={[tone.ring, theme.palette.confidenceRing.trackColour]}
 				margin={0}
-                hideLegend
+				hideLegend
+				slotProps={{ tooltip: {trigger: 'none'}}}
                 aria-hidden
             />
             <Box className='url-checker-confidence-label'>
@@ -254,7 +255,7 @@ export default function UrlChecker() {
 	return (
 		<Container className='main-w-side url-checker-page'>
 			<Typography variant='h2' component='h1' gutterBottom>
-				URL Checker
+				PhishGuard URL Checker
 			</Typography>
 
 			<Paper className='url-checker-hero'>

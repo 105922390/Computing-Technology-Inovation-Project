@@ -14,7 +14,8 @@ function Root() {
         palette: {
             mode: themeMode,
             primary: {
-                main: isDarkMode ? "#3aa2c4" : "#3aa2c4",
+				main: isDarkMode ? "#3aa2c4" : "#3aa2c4",
+				light: isDarkMode ? "#446a76" : "#90d9f2",
                 dark: isDarkMode ? "#287994" : "#287994",
                 contrastText: "#ffffff",
             },
@@ -266,14 +267,14 @@ function Root() {
             },
             MuiAppBar: {
 				styleOverrides: {
-				    root: {
+				    root: ({theme}) => ({
 				        color: isDarkMode ? "#f2f3fa" : "#1d2433",
-				        backgroundColor: isDarkMode ? "#191f30" : "#d0e3ea",
+				        backgroundColor: theme.palette.primary.light,
 				        backgroundImage: "none",
 				        boxShadow: "none",
 						borderBottom: `1px solid ${isDarkMode ? "rgba(255,255,255,0.12)" : "#c0d1d7"}`,
 						borderRadius: 0,
-				    },
+				    }),
 				},
             },
             MuiToolbar: {

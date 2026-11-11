@@ -20,7 +20,7 @@ export default function HistoryAnalysisChart({ data = [] }) {
 		{ label: "Unique URLs analysed", value: data.length },
 		{ label: "Safe", value: counts.safe, color: theme.palette.confidenceRing.safe.ring },
 		{ label: "Caution", value: counts.caution, color: theme.palette.confidenceRing.caution.ring },
-		{ label: "Unsafe", value: counts.unsafe, color: theme.palette.confidenceRing.unsafe.ring },
+		{ label: "Not Safe", value: counts.unsafe, color: theme.palette.confidenceRing.unsafe.ring },
 	];
 
 	return (
@@ -46,61 +46,70 @@ export default function HistoryAnalysisChart({ data = [] }) {
 
 			<Box
 				sx={{
-					display: "grid",
-					gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 130px), 1fr))",
-					gap: 1.5,
+					display:"flex"
 				}}
 			>
-				{metrics.map(({ label, value, color }) => (
-					<Box
-						key={label}
-						sx={{
-							minWidth: 0,
-							p: 2,
-							textAlign: "center",
-							borderRadius: "14px",
-							backgroundColor: theme.palette.mode === "dark"
-								? "rgba(255,255,255,0.045)"
-								: "#f4f6fb",
-						}}
-					>
-						<Typography variant="h4" sx={{ color: color ?? "text.primary" }}>
-							{value}
-						</Typography>
-						<Typography variant="body2" color="text.secondary">
-							{label}
-						</Typography>
-					</Box>
-				))}
-			</Box>
 
-			<Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
-				<PieChart
-					className="url-checker-confidence-chart"
-					width={chartSize}
-					height={chartSize}
-					series={[{
-						data: [
-							{ id: "safe", value: counts.safe },
-							{ id: "caution", value: counts.caution },
-							{ id: "unsafe", value: counts.unsafe },
-						],
-						innerRadius: 70,
-						outerRadius: 92,
-						startAngle: 0,
-						endAngle: 360,
-						cornerRadius: 8,
-						paddingAngle: 0,
-						sortingValues: "none",
-					}]}
-					colors={[
-						theme.palette.confidenceRing.safe.ring,
-						theme.palette.confidenceRing.caution.ring,
-						theme.palette.confidenceRing.unsafe.ring,
-					]}
-					margin={0}
-					hideLegend
-				/>
+				<Box
+					sx={{
+						display: "flex",
+						flexDirection: "column",
+						gap: 1.5,
+						width: "50%"
+					}}
+				>
+					{metrics.map(({ label, value, color }) => (
+						<Box
+							key={label}
+							sx={{
+								minWidth: 0,
+								p: 2,
+								textAlign: "center",
+								borderRadius: "14px",
+								backgroundColor: theme.palette.mode === "dark"
+									? "rgba(255,255,255,0.045)"
+									: "#e2e2e2",
+							}}
+						>
+							<Typography variant="h4" sx={{ color: color ?? "text.primary" }}>
+								{value}
+							</Typography>
+							<Typography variant="body2" color="text.secondary">
+								{label}
+							</Typography>
+						</Box>
+					))}
+				</Box>
+
+				<Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
+					<PieChart
+						className="url-checker-confidence-chart"
+						width={chartSize}
+						height={chartSize}
+						series={[{
+							data: [
+								{ id: "safe", value: counts.safe, label: "Safe" },
+								{ id: "caution", value: counts.caution, label: "Caution" },
+								{ id: "unsafe", value: counts.unsafe, label: "Not Safe" },
+							],
+							innerRadius: 0,
+							startAngle: 0,
+							endAngle: 360,
+							cornerRadius: 8,
+							paddingAngle: 0,
+							sortingValues: "none",
+							highlightScope: { fade: 'global', highlight: 'item' },
+      						faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
+						}]}
+						colors={[
+							theme.palette.confidenceRing.safe.ring,
+							theme.palette.confidenceRing.caution.ring,
+							theme.palette.confidenceRing.unsafe.ring,
+						]}
+						margin={0}
+						hideLegend
+					/>
+				</Box>
 			</Box>
 		</Paper>
 	);
