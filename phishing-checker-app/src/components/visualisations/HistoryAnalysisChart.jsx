@@ -1,217 +1,107 @@
-import { Box } from '@mui/material';
-import { ChartsAxisHighlightValue } from '@mui/x-charts';
-import { BarChart } from '@mui/x-charts/BarChart';
+import { Box, Paper, Typography, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { PieChart } from "@mui/x-charts/PieChart";
 
-function FormatWaterfallData(data, startProb){
-  const keys = Object.keys(data)
+export default function HistoryAnalysisChart({ data = [] }) {
+	const theme = useTheme();
+	const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+	const chartSize = isSmallScreen ? 220 : 260;
+	const counts = data.reduce(
+		(totals, entry) => {
+			if (entry.result in totals) {
+				totals[entry.result]++;
+			}
+			return totals;
+		},
+		{ safe: 0, caution: 0, unsafe: 0 }
+	);
 
-  var currentTotal = Math.round(startProb*10000)/100
-  var othersTotal = 0
-  var otherFeatures = []
-  var dataset = []
-  dataset.push({feature: "Starting Probability", fill: 0, pos: 0, neg: 0, grey:currentTotal})
+	const metrics = [
+		{ label: "Unique URLs analysed", value: data.length },
+		{ label: "Safe", value: counts.safe, color: theme.palette.confidenceRing.safe.ring },
+		{ label: "Caution", value: counts.caution, color: theme.palette.confidenceRing.caution.ring },
+		{ label: "Unsafe", value: counts.unsafe, color: theme.palette.confidenceRing.unsafe.ring },
+	];
 
-  keys.forEach(feature => {
-    const contrib = Math.round(data[feature]['contribution']*10000)/100
-    if (Math.abs(contrib) >= 2){
-      var blank
-      var minus = 0
-      var plus = 0
-      if(contrib <= 0){
-        minus = Math.abs(contrib)
-        blank = currentTotal+contrib
-      } else {
-        plus = Math.abs(contrib)
-        blank = currentTotal
-      }
-      dataset.push({feature: feature, fill: blank, pos: plus, neg: minus, grey:0})
-      currentTotal += contrib
-    } else {
-      otherFeatures.push(feature)
-      othersTotal += contrib
-    }
-  })
+	return (
+		<Paper
+			className="page-section"
+			sx={{
+				width: "100%",
+				maxWidth: 960,
+				mx: "auto",
+				my: 2,
+				p: "clamp(1.25rem, 4vw, 2.5rem)",
+				gap: 2,
+				borderRadius: "20px",
+				border: `1px solid ${theme.palette.divider}`,
+				boxShadow: theme.palette.mode === "dark"
+					? "0 20px 60px rgba(0,0,0,0.2)"
+					: "0 20px 60px rgba(31,42,71,0.06)",
+			}}
+		>
+			<Typography variant="h5" component="h2" sx={{ textAlign: "center" }}>
+				Session Results
+			</Typography>
 
-  othersTotal = (Math.round(othersTotal*100)/100)
-  if (othersTotal >= 0){
-    dataset.push({feature: "other", fill: currentTotal, pos: othersTotal, neg: 0, grey:0})
-  } else{
-    dataset.push({feature: "other", fill: (currentTotal+othersTotal), pos: 0, neg: Math.abs(othersTotal), grey:0})
-  }
-  currentTotal = Math.round((currentTotal + othersTotal)*100)/100
-  dataset.push({feature: "Total", fill: 0, pos: 0, neg: 0, grey:currentTotal})
+			<Box
+				sx={{
+					display: "grid",
+					gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 130px), 1fr))",
+					gap: 1.5,
+				}}
+			>
+				{metrics.map(({ label, value, color }) => (
+					<Box
+						key={label}
+						sx={{
+							minWidth: 0,
+							p: 2,
+							textAlign: "center",
+							borderRadius: "14px",
+							backgroundColor: theme.palette.mode === "dark"
+								? "rgba(255,255,255,0.045)"
+								: "#f4f6fb",
+						}}
+					>
+						<Typography variant="h4" sx={{ color: color ?? "text.primary" }}>
+							{value}
+						</Typography>
+						<Typography variant="body2" color="text.secondary">
+							{label}
+						</Typography>
+					</Box>
+				))}
+			</Box>
 
-  return [dataset, otherFeatures]
-}
-
-function getFeatureName(id){
-  switch (id){
-    case "has_ip":
-      return "IP Address"
-    case "has_at":
-      return "Has @"
-    case "has_port":
-      return "Uses Port Number"
-    case "suspicious_tld":
-      return "Suspicious TLD"
-    case "brand_not_in_domain":
-      return "Brand Mismatch"
-    case "suspicious_words":
-      return "Suspicious Words"
-    case "is_shortener":
-      return "Shortener"
-    case "num_hyphens_host":
-      return "Hyphens"
-    case "num_dots_host":
-      return "Dots"
-    case "url_length":
-      return "URL Length"
-    case "path_length":
-      return "Path Length"
-    case "host_length":
-      return "Host Length"
-    case "digit_ratio":
-      return "Digit Ratio"
-    case "num_digits":
-      return "Digits"
-    case "num_special":
-      return "Special Char"
-    case "path_depth":
-        return "Path Depth"
-    case "host_entropy":
-      return "Host Entropy"
-    case "has_encoding":
-      return "Encoding"
-    case "other":
-      return "Other Features"
-  }
-  return id
-}
-
-function valueFormatter(value) {
-  if (typeof value === 'number') {
-    return Math.round(value).toString()+"%";
-  }
-  return value;
-}
-
-export default function ContributionWaterfallGraph({data, startProb, onClickBar}) {
-
-	const [dataset, otherFeatures] = FormatWaterfallData(data, startProb)  
- 	const theme = useTheme();
-
-  return (
-    <Box
-      sx ={{
-        display: 'flex',
-        alignItems: 'center',
-      }}
-    >
-      <BarChart
-        dataset={dataset}
-        series={[
-          {dataKey: 'fill', id: 'fill', stack: 'stack', color: 'transparent', valueFormatter: () => null},
-          {
-            dataKey: 'pos',
-            id: 'feature_pos',
-            stack: 'stack', 
-            color: theme.palette.chart.negative,
-            barLabelPlacement: 'outside',
-            minBarSize: 2,
-            highlightScope:{
-              highlight: 'item',
-              fade: 'global'
-            },
-            valueFormatter: (value, {dataIndex}) => {
-              return value != 0 ? `${dataset[dataIndex].feature} +${value}%` : null},
-            barLabel: (item) => {
-              return item.value != 0 ? `+${item.value}%` : null},
-          },
-          {
-            dataKey: 'neg',
-            id: 'feature_neg',
-            stack: 'stack', 
-            color: theme.palette.chart.positive,
-            barLabelPlacement: 'outside',
-            minBarSize: 2,
-            highlightScope:{
-              highlight: 'item',
-              fade: 'global'
-            },
-            valueFormatter: (value, {dataIndex}) => {
-              return value != 0 ? `${dataset[dataIndex].feature} -${value}%` : null},
-            barLabel: (item) => {
-              return item.value != 0 ? `-${item.value}%` : null},
-          },
-          {
-            dataKey: 'grey', 
-            id: 'grey', 
-            stack: 'stack', 
-           color: theme.palette.chart.baseline,
-            barLabelPlacement: 'outside',
-            minBarSize: 2,
-            highlightScope:{
-              highlight: 'item',
-              fade: 'global'
-            },
-            valueFormatter: (value, {dataIndex}) => {
-              return value != 0 ? `${dataset[dataIndex].feature} +${value}%` : null},
-            barLabel: (item) => {
-              return item.value != 0 ? `${item.value}%` : null},
-          }
-        ]}
-        height={300}
-        xAxis={[{
-          label: 'Probabilty URL is Malicious (%)',
-          min: 0,
-          max: 120,
-          tickInterval: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-        }]}
-        yAxis={[{
-          dataKey: 'feature',
-          label: "URL Features",
-          width: 120,
-          valueFormatter: (value) => {
-            return getFeatureName(value);
-          },
-        }]}
-        layout = 'horizontal'
-        hideLegend = {true}
-        axisHighlight={{
-          x: 'line',
-          y: 'none'
-        }}
-        slotProps={{
-          bar: {
-            rx: 3,
-            ry: 3,
-          },
-          tooltip:{
-            trigger: 'item',
-          },
-        }}
-        overflow='visible'
-        onItemClick={(event, item) => {
-          console.log("clicked: " + dataset[item.dataIndex].feature + "| seriesId: " + item.seriesId + "| dataIndex: " + item.dataIndex)
-          if (item.seriesId != 'fill'){
-            if (item.seriesId == 'grey'){
-              onClickBar(dataset[item.dataIndex].feature, otherFeatures, false, true)
-            }
-            else{
-              var other = false
-              if (dataset[item.dataIndex].feature == "other"){ other = true }
-              onClickBar(dataset[item.dataIndex].feature, otherFeatures, other, false)
-            }
-          }
-        }}
-      >
-        <ChartsAxisHighlightValue
-          axisDirection="x"
-          labelPosition="both"
-          valueFormatter={valueFormatter}
-        />
-      </BarChart>
-    </Box>
-  );
+			<Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
+				<PieChart
+					className="url-checker-confidence-chart"
+					width={chartSize}
+					height={chartSize}
+					series={[{
+						data: [
+							{ id: "safe", value: counts.safe },
+							{ id: "caution", value: counts.caution },
+							{ id: "unsafe", value: counts.unsafe },
+						],
+						innerRadius: 70,
+						outerRadius: 92,
+						startAngle: 0,
+						endAngle: 360,
+						cornerRadius: 8,
+						paddingAngle: 0,
+						sortingValues: "none",
+					}]}
+					colors={[
+						theme.palette.confidenceRing.safe.ring,
+						theme.palette.confidenceRing.caution.ring,
+						theme.palette.confidenceRing.unsafe.ring,
+					]}
+					margin={0}
+					hideLegend
+				/>
+			</Box>
+		</Paper>
+	);
 }
