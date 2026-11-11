@@ -43,6 +43,8 @@ function Navbar({ themeMode, onToggleThemeMode }) {
 				</Tooltip>
 
 				<Button color="inherit" component={RouterLink} to="/url-checker" disableRipple >URL Checker</Button>
+				<Button color="inherit" component={RouterLink} to="/login" disableRipple >Login</Button>
+				<Button color="inherit" component={RouterLink} to="/signup" disableRipple >Sign Up</Button>
 				<LearnMenu />
 				<Button color="inherit" component={RouterLink} to="/about" disableRipple >About Us</Button>
 				<Button color="inherit" component={RouterLink} to="/help" disableRipple >Help</Button>

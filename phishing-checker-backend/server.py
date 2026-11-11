@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from predict import predict_url
-from sqlalchemy import create_engine
+from user_repositiory import login_user, create_user, get_user_by_username
+
 
 app = FastAPI()
 
@@ -13,12 +14,12 @@ CORSMiddleware,
     allow_headers=["Content-Type"],
 )
 
-# engine = create_engine(
-#     "mysql+pymysql://user:password@localhost/mydb"
-# )
-
 class UrlRequest(BaseModel):
     url: str
+
+class SignUpRequest(BaseModel):
+    username: str
+    password: str
 
 @app.post("/process-data")
 def process_data(payload: UrlRequest):
@@ -29,19 +30,22 @@ def process_data(payload: UrlRequest):
 def read_root():
     return {"message": "Welcome to the Phishing URL Checker API!"}
 
-# @app.get("/users/{user_id}")
-# def get_user(user_id: int):
+@app.get("/log-in")
+def log_in(username: str, password: str):
+    login = login_user(username, password)
+    return login
 
-#     with engine.connect() as conn:
-#         result = conn.execute(
-#             text("""
-#                 SELECT *
-#                 FROM users
-#                 WHERE id = :id
-#             """),
-#             {"id": user_id}
-#         )
+@app.post("/sign-up")
+def sign_up(request: SignUpRequest):
+    create_user(request.username, request.password)
+    user = get_user_by_username(request.username)
+    if user != None:
+        return True
+    else:
+        return False
 
-#         user = result.mappings().first()
-
-#         return user
+@app.get("/check-username-free")
+def check_username_free(username: str):
+    existing = get_user_by_username(username)
+    available = existing is None
+    return available

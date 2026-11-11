@@ -8,6 +8,8 @@ const AboutTool = lazy(() => import('./pages/AboutTool.jsx'));
 const AboutPhishing = lazy(() => import('./pages/AboutPhishing.jsx'));
 const Help = lazy(() => import('./pages/Help.jsx'));
 const UrlChecker = lazy(() => import('./pages/UrlChecker.jsx'));
+const Login = lazy(() => import('./pages/Login.jsx'));
+const Signup = lazy(() => import('./pages/Signup.jsx'));
 import PageNotExist from './pages/error_pages/PageNotExist.jsx'
 import UnexpectedFailure from './pages/error_pages/UnexpectedFailure.jsx'
 
@@ -31,6 +33,8 @@ function App({ themeMode, onToggleThemeMode, history, setHistory }) {
 					<Route path="/about-phishing" element={<AboutPhishing />} />
 					<Route path="/help" element={<Help />} />
 					<Route path="/url-checker" element={<UrlChecker history={history} setHistory={setHistory} />} />
+					<Route path="/login" element={<Login />} />
+					<Route path="/signup" element={<Signup />} />
 					<Route path="/error-unexpected-failure" element={<UnexpectedFailure />} />
 					<Route path="*" element={<PageNotExist />} />
 				</Route>
