@@ -104,7 +104,7 @@ Accounting for the standard deviation of these values, the status of a given use
 This makes all login attempts marginally slower, however only by `~100ms`, which is largely unnoticable to users, especially when it can take longer than that to just load the page itself, and only on the log-in screen, **not** sitewide . This makes this security deployment a well-worth trade off.
 
 ## Dependency Versions
-The backend was developed with Python 3.14, and the frontend with React v19.3.0. For entire dependencies, see `requirements.txt` in the backend and `package.json` in the frontend. 
+The backend was developed with Python 3.14, and the frontend with node v24.21.0, npm v12.2.0, React v19.3.0. For entire dependencies, see `requirements.txt` in the backend and `package.json` in the frontend. 
 
 ## Generative AI Statement
 The output of generative AI was not used for our project and the entire outputs of generative AI are not present in the project.
