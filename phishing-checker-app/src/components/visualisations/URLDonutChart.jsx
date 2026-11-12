@@ -5,7 +5,7 @@ import Typography from "@mui/material/Typography";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import { useDrawingArea } from "@mui/x-charts/hooks";
-import { styled } from "@mui/material/styles";
+import { styled, useTheme } from "@mui/material/styles";
 
 const catagories = ["Length", "Host", "Path", "Symbols", "Words"];
 const features = 
@@ -191,6 +191,8 @@ function PieCenterLabel({ children }) {
 }
 
 export default function URLPie({dataset}) {
+  const theme = useTheme();
+  const arcLabelFill = theme.palette.mode === "dark" ? "#1d2433" : undefined;
   const [view, setView] = React.useState("feature");
   const handleViewChange = (event, newView) => {
     if (newView !== null) {
@@ -242,6 +244,7 @@ export default function URLPie({dataset}) {
             sx={{
               [`& .${pieClasses.arcLabel}`]: {
                 fontSize: "12px",
+                fill: arcLabelFill,
               },
             }}
             hideLegend
@@ -282,6 +285,7 @@ export default function URLPie({dataset}) {
             sx={{
               [`& .${pieClasses.arcLabel}`]: {
                 fontSize: "12px",
+                fill: arcLabelFill,
               },
             }}
             hideLegend

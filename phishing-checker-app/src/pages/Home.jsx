@@ -62,7 +62,7 @@ export default function Home() {
 					}}
 				>
 					<Typography variant="p" component="p" sx={{ flex: 1 }}>
-						A brief sentance-long explanation of phishing scams.
+						A phishing scam is where an attacker pretends to be someone they're not to get your sensitive information.
 					</Typography>
 
 					<Button
