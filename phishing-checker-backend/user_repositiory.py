@@ -70,18 +70,27 @@ def get_user_by_username(username:str):
 
 
 ## Determines if a user sucessfully logged in with the provided details
-def login_user(username:str, password: str):
+def verify_user(username:str, password: str):
     user = get_user_by_username(username)
 
     if not user:
         # return # Uncomment for testing purposes
         password_hash.verify(password, DUMMY_HASH)
-        return {"error": "Invalid username or password"}
+        return {
+            "success": False,
+            "error": "Invalid username or password"
+            }
 
     if not check_password(
         password,
         user.password_hash
     ):
-        return {"error": "Invalid username or password"}
+        return {
+            "success": False,
+            "error": "Invalid username or password"
+            }
 
-    return {"success": True}
+    return {
+            "success": True,
+            "user_id": user.id
+            }

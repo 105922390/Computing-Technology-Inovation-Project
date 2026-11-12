@@ -21,6 +21,8 @@ SET time_zone = "+00:00";
 -- Database: `phishing_url_checker`
 --
 
+CREATE DATABASE phishing_url_checker;
+
 -- --------------------------------------------------------
 
 --

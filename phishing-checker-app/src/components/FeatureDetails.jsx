@@ -91,8 +91,8 @@ export default function featureDetails({featureId, value})
     console.log("value: " + typeof(value))
     const [title, text] = getFeatureText(featureId, value)
     return(
-        <div className="feature-desc">
-            <Typography variant="h6">{title}</Typography>
+        <div color='' className="feature-desc">
+            <Typography color='info' variant="h6">{title}</Typography>
             <Typography>{text}</Typography>
         </div>
     )

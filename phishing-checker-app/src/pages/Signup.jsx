@@ -2,7 +2,8 @@ import {
 	Typography, Container,
 	TextField,
 	Button,
-	Box
+	Box,
+	Paper
 } from '@mui/material';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
@@ -35,7 +36,7 @@ async function createUser(username, password){
 	return response.data
 } 
 
-export default function Help() {
+export default function Signup({user, loggedIn}) {
 	useEffect(() => {
 		document.title = 'Sign Up';
 	}, []);
@@ -91,6 +92,26 @@ export default function Help() {
 					'Something went wrong. Please try again. | Error code: ' + status
 				);
 			}
+			console.error(error)
+		}
+	}
+
+	const checkUsernameAvailable = async (username) => {
+		try{
+			const isAvailable = await checkUsername(username)
+			return isAvailable
+		} catch (error) {
+			const status = error.response?.status
+
+			if (status === 503) {
+				setGeneralError('Too many requests! Please wait before trying again.');
+			} else if (status == null) {
+				setGeneralError('Unable to reach the server. Please try again.');
+			} else {
+				setGeneralError(
+					'Something went wrong. Please try again. | Error code: ' + status
+				);
+			}
 			console.error(error);
 		}
 	}
@@ -101,32 +122,39 @@ export default function Help() {
 				Sign Up
 			</Typography>
 
-			<Typography variant='p' component="p" gutterBottom>
-				Don't like Phish? Create an account with PhishGuard!
-			</Typography>
+			<Paper className='url-checker-hero'>
+				{(!loggedIn) && (
+					<Typography variant='p' component="p" gutterBottom>
+						Don't like Phish? Create an account with PhishGuard!
+					</Typography>
+				)}
 
-			<form onSubmit={handleSubmit} className='url-checker-form'>
-					<TextField
-					label="Username"
-					value={username}
-					onChange={(event) => setUsername(event.target.value)}
-					placeholder= 'username'
-					fullWidth
-					/>
-					{(usernameError != null) && (
-						<Typography variant="caption" color='error' role='alert'>{usernameError}</Typography>
-					)}
+				<form onSubmit={handleSubmit} className='login-signup-form'>
+					<box className="form-input">
+						<TextField
+						label="Username"
+						value={username}
+						onChange={(event) => setUsername(event.target.value)}
+						placeholder= 'username'
+						fullWidth
+						/>
+						{(usernameError != null) && (
+							<Typography variant="caption" color='error' role='alert'>{usernameError}</Typography>
+						)}
+					</box>
 
-					<TextField
-					label="Password"
-					value={password}
-					onChange={(event) => setPassword(event.target.value)}
-					placeholder= 'Password'
-					fullWidth
-					/>
-					{(passwordError != null) && (
-						<Typography variant="caption" color='error' role='alert'>{passwordError}</Typography>
-					)}
+					<box className="form-input">
+						<TextField
+						label="Password"
+						value={password}
+						onChange={(event) => setPassword(event.target.value)}
+						placeholder= 'Password'
+						fullWidth
+						/>
+						{(passwordError != null) && (
+							<Typography variant="caption" color='error' role='alert'>{passwordError}</Typography>
+						)}
+					</box>
 
 					<Button
 					type='submit'
@@ -136,20 +164,28 @@ export default function Help() {
 					>
 						Sign Up
 					</Button>
-			</form>
-			
-			{(generalError != null) && (
-				<Typography variant="caption" color='error' role='alert'>{generalError}</Typography>
-			)}
-			{success && (
-				<Box>
-					<Typography variant='h5' component="h2" gutterBottom>
-					Account created successfully!
-					</Typography>
+				</form>
+				
+				{(generalError != null) && (
+					<Typography variant="caption" color='error' role='alert'>{generalError}</Typography>
+				)}
+				<box className="login-signup-confirm">
+					{(success) && (
+						<Box>
+							<Typography color='primary' variant='subtitle1' component="h2">
+							Account created successfully!
+							</Typography>
 
-					<Button color="inherit" component={RouterLink} to="/login" disableRipple >Go to login</Button>
-				</Box>
-			)}
+							<Button color="inherit" component={RouterLink} to="/login" disableRipple >Go to login</Button>
+						</Box>
+					)}
+					{(loggedIn && !success) && (
+						<Typography color='textSecondary' variant='p' component="p">
+							Note: you are currently logged in as: "{user}", are you sure you want to make another account?
+						</Typography>
+					)}
+				</box>
+			</Paper>
 		</Container>
 	);
 }

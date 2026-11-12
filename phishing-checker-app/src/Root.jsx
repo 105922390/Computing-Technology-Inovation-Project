@@ -103,6 +103,10 @@ function Root() {
 						paddingBottom: "3rem",
 						// gap: "10rem",
 				    },
+					".url-checker-hero-greeting": {
+				        maxWidth: 780,
+				        margin: "0 auto 0rem",
+				    },
 				    ".url-checker-hero": {
 				        maxWidth: 780,
 				        margin: "0 auto 0rem",
@@ -248,8 +252,57 @@ function Root() {
 						
 						borderRadius: "14px",
 						padding: "24px",
-					}
-					
+					},
+					 ".hero": {
+				        maxWidth: 780,
+				        margin: "0 auto 0rem",
+				        padding: "clamp(1.25rem, 4vw, 2.5rem)",
+				        border: `1px solid ${isDarkMode ? "rgba(255,255,255,0.12)" : "#e4e8f0"}`,
+				        borderRadius: "20px",
+				        boxShadow: isDarkMode
+				            ? "0 20px 60px rgba(0,0,0,0.24)"
+				            : "0 20px 60px rgba(31,42,71,0.08)",
+				    },
+					".login-signup-form": {
+						display: "flex",
+				        gap: "0.75rem",
+						alignItems: "stretch",
+						"& .MuiTextField-root": {
+				            flex: 1,
+				        },
+				        "& .MuiButton-root": {
+							minHeight: 57,
+				            borderRadius: "12px",
+							alignSelf: "flex-start",
+				        },
+						"@media (max-width: 600px)": {
+							justifyContent: "center",
+				            flexDirection: "column",
+				            "& .MuiButton-root": {
+				                minHeight: 52,
+								flex: "auto",
+				            },
+				        },
+				    },
+					".form-input": {
+						display: "flex",
+						flexDirection: "column",
+						flex: 1,
+						minWidth: 0,
+					},
+					".login-signup-confirm":{
+						marginTop:"2rem",
+						textAlign:"center",
+						display: "flex",
+						flexDirection:"column",
+						justifyContent: "center",
+					},
+					".login-next-buttons":{
+						marginTop:"2rem",
+						display: "flex",
+				        gap: "0.75rem",
+						justifyContent: "center",
+					}	
 				},
             },
             MuiPaper: {

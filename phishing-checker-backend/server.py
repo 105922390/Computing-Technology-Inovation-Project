@@ -1,12 +1,14 @@
 import os
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Request, Query
+from starlette.middleware.sessions import SessionMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Annotated
 from predict import predict_url
 from rate_limit import RateLimiter, RateLimitMiddleware
-from user_repositiory import login_user, create_user, get_user_by_username
+from settings import SESSION_SECRET_KEY
+from user_repositiory import verify_user, create_user, get_user_by_username, get_user
 import metadata as meta
 
 
@@ -33,11 +35,17 @@ app.add_middleware(RateLimitMiddleware, limiter=rate_limiter)
 
 app.add_middleware(
 CORSMiddleware,
-    allow_origins=["http://localhost:5173",
-                #    "http://<local_ip>:5173"	## For hosting
+    allow_origins=["http://localhost:5173"
+                   #    "http://<local_ip>:5173"	## For hosting
                    ],
-    allow_methods=["POST", "GET"],
-    allow_headers=["Content-Type"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=SESSION_SECRET_KEY
 )
 
 class UrlRequest(BaseModel):
@@ -75,18 +83,29 @@ def process_data(payload: UrlRequest):
 def read_root():
     return {"message": "Welcome to the Phishing URL Checker API!"}
 
-
 @app.post(
-        "/log-in", 
-	tags=["users"],
-    summary="Attempts to log the user in",
-    description="Takes the given username and password, checks to see if they are valid and correct, then returns the result.",
-    response_description="Whether the user should be logged in or not.",
-    responses=meta.login_responses,
-)
-def log_in(request: UserData):
-    login = login_user(request.username, request.password)
-    return login
+        "/log-in",
+        tags=["users"],
+            summary="Attempts to log the user in",
+            description="Takes the given username and password, checks to see if they are valid and correct, then returns the result.",
+            response_description="Whether the user should be logged in or not.",
+            responses=meta.login_responses,
+          )
+def login(credentials: UserData, request: Request):
+    login = verify_user(credentials.username, credentials.password)
+
+    if (login and login["success"] == True):
+        request.session["user_id"] = login["user_id"]
+        return {"success": True}
+    
+    return {
+        "success": False,
+        "error" : login["error"]
+        }
+
+@app.post("/log-out")
+def logout(request: Request):
+    request.session.clear()
 
 
 @app.post("/sign-up", 
@@ -130,3 +149,17 @@ def check_username_free(
     existing = get_user_by_username(username)
     available = existing is None
     return available
+
+@app.get("/user-data")
+def user_data(request: Request):
+    user_id = request.session.get("user_id") 
+
+    if not user_id:
+        return {"logged_in": False}
+    
+    user = get_user(user_id)
+
+    return {
+            "logged_in": False,
+            "user": user
+            }
