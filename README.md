@@ -12,3 +12,9 @@
 }
 ```
 * In Postman, use the Body tab under the url bar.
+
+## Backend rate limiting
+The backend allows up to 5 requests per source IP in a 10 second window by default. Requests over the limit receive HTTP 503 with a `Retry-After` header. Set `RATE_LIMIT_MAX_REQUESTS` and `RATE_LIMIT_WINDOW_SECONDS` in the backend `.env` file to change these defaults.
+
+## Frontend API endpoint
+The frontend reads its backend URL from `VITE_API_BASE_URL`, configured once in `phishing-checker-app/src/services/api.js`. Copy `phishing-checker-app/.env.example` to `phishing-checker-app/.env`.

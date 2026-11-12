@@ -10,6 +10,7 @@ import {
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { PieChart } from '@mui/x-charts/PieChart';
+import { API_BASE_URL } from '../services/api.js';
 // import DonutChart from "../components/visualisations/URLDonutChart.jsx";
 import WaterfallChart from "../components/visualisations/ContributionWaterfallGraph.jsx";
 import AboutFeature from "../components/FeatureDetails.jsx"
@@ -181,12 +182,13 @@ function ResultDisplay({phishProb, confidence, data, startProb}) {
 
 async function fetchPrediction(inputUrl){
 	const response = await axios.post(
-		'http://localhost:8000/process-data', 
+		`${API_BASE_URL}/process-data`,
 		{ url : inputUrl }
 	);
-
-	return response.data.result
+	
+	return response
 } 
+
 
 
 export default function UrlChecker({history, setHistory}) {
@@ -220,10 +222,13 @@ export default function UrlChecker({history, setHistory}) {
 
 		try {
 			// Axios call to backend, ask predicted saftey of provided url
-			const result = await fetchPrediction(url);
-			console.log("got return");
+			const response = await fetchPrediction(url);
+			
+			const result = response.data.result
+			// console.log(result)
+			// console.log("got return");
 			setError(result.error);
-			console.log(result.result_data)
+			// console.log(result.result_data)
 			if (result.result_data != undefined){
 				setPishProb(result.phish_prob);
 				setConfidence(result.confidence);
@@ -248,7 +253,17 @@ export default function UrlChecker({history, setHistory}) {
 
 			
 		} catch (error) {
-			setError('Error analysing url. Please try again. | ' + error);
+			const status = error.response?.status
+
+			if (status === 503) {
+				setError('Too many requests! Please wait before trying again.');
+			} else if (status == null) {
+				setError('Unable to reach the server. Please try again.');
+			} else {
+				setError(
+					'Something went wrong. Please try again. | Error code: ' + status
+				);
+			}
 			console.error(error);
 		} finally {
 			setLoading(false);
