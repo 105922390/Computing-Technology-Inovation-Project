@@ -74,7 +74,6 @@ def verify_user(username:str, password: str):
     user = get_user_by_username(username)
 
     if not user:
-        # return # Uncomment for testing purposes
         password_hash.verify(password, DUMMY_HASH)
         return {
             "success": False,
