@@ -10,10 +10,10 @@ import { API_BASE_URL } from '../services/api.js';
 
 async function fetchLogin(username, password){
 	const response = await axios.post(
-		`${API_BASE_URL}/log-in`,
+		`${API_BASE_URL}/verify-user`,
 		{
-				username : username,
-				password : password 
+			username : username,
+			password : password 
 		}
 		
 	);
@@ -38,6 +38,7 @@ export default function Help() {
 		setPasswordError(null)
 		setUsernameError(null)
 		setGeneralError(null)
+		setSuccess(false)
 
 		if(username == ""){
 			console.log("empty username")

@@ -82,8 +82,6 @@ export default function Help() {
 		} catch (error) {
 			setGeneralError(error)
 			console.error(error);
-		} finally {
-
 		}
 	}
 

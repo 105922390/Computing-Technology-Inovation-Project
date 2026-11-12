@@ -1,11 +1,14 @@
 import os
 
 from fastapi import FastAPI
+from starlette.middleware.sessions import SessionMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from predict import predict_url
 from rate_limit import RateLimiter, RateLimitMiddleware
-from user_repositiory import login_user, create_user, get_user_by_username
+from settings import SESSION_SECRET_KEY
+from user_repositiory import verify_user, create_user, get_user_by_username
+
 
 
 app = FastAPI()
@@ -18,11 +21,15 @@ app.add_middleware(RateLimitMiddleware, limiter=rate_limiter)
 
 app.add_middleware(
 CORSMiddleware,
-    allow_origins=["http://localhost:5173",
-                #    "http:/<your local ip>:5173"
-                   ],
-    allow_methods=["POST", "GET"],
-    allow_headers=["Content-Type"],
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=SESSION_SECRET_KEY
 )
 
 class UrlRequest(BaseModel):
@@ -41,9 +48,9 @@ def process_data(payload: UrlRequest):
 def read_root():
     return {"message": "Welcome to the Phishing URL Checker API!"}
 
-@app.post("/log-in")
+@app.post("/verify-user")
 def log_in(request: UserData):
-    login = login_user(request.username, request.password)
+    login = verify_user(request.username, request.password)
     return login
 
 @app.post("/sign-up")
