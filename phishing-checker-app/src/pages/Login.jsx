@@ -2,7 +2,8 @@ import {
 	Typography, Container,
 	TextField,
 	Button,
-	Box
+	Box,
+	Paper
 } from '@mui/material';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
@@ -120,52 +121,60 @@ export default function Login({user, setUser, loggedIn, setLoggedIn}) {
 			</Typography>
 
 			{(!success && !loggedIn) && (
-				<form onSubmit={handleSubmit} className='url-checker-form'>
-					<TextField
-					label="Username"
-					value={username}
-					onChange={(event) => setUsername(event.target.value)}
-					placeholder= 'username'
-					fullWidth
-					/>
-					{(usernameError != null) && (
-						<Typography variant="caption" color='error' role='alert'>{usernameError}</Typography>
-					)}
+				<Paper className='page-section hero'>
+					<form onSubmit={handleSubmit} className='login-signup-form'>
+						<Box className="form-input">
+							<TextField
+							label="Username"
+							value={username}
+							onChange={(event) => setUsername(event.target.value)}
+							placeholder= 'username'
+							fullWidth
+							/>
+							{(usernameError != null) && (
+							<Typography variant="caption" color='error' role='alert'>{usernameError}</Typography>
+							)}
+						</Box>
 
-					<TextField
-					label="Password"
-					value={password}
-					onChange={(event) => setPassword(event.target.value)}
-					placeholder= 'Password'
-					fullWidth
-					/>
-					{(passwordError != null) && (
-						<Typography variant="caption" color='error' role='alert'>{passwordError}</Typography>
-					)}
-
+						<Box className="form-input">
+							<TextField
+							label="Password"
+							value={password}
+							onChange={(event) => setPassword(event.target.value)}
+							placeholder= 'Password'
+							fullWidth
+							/>
+							{(passwordError != null) && (
+							<Typography variant="caption" color='error' role='alert'>{passwordError}</Typography>
+							)}
+						</Box>
+						
+						<Button
+						type='submit'
+						variant='contained'
+							size='large'
+						className='glow-button'
+						>
+							Login
+						</Button>
+					</form>
 					{(generalError != null) && (
 						<Typography color='error' role='alert'>{generalError}</Typography>
 					)}
-					<Button
-					type='submit'
-					variant='contained'
-						size='large'
-					className='glow-button'
-					>
-						Enter
-					</Button>
-				</form>
+				</Paper>
 			)}
 			
 			{(success || loggedIn) && (
-				<Box>
+				<Paper className="login-confirm paper-section hero">
 					<Typography variant="h5" component="h2">
 						Welcome {user}, you are logged in!
 					</Typography>
 					
-					<Button component={RouterLink} to="/url-checker" disableRipple >To Url Checker</Button>
-					<Button onClick={handleLogout}>Log Out</Button>
-				</Box>
+					<Box className="login-next-buttons">
+						<Button component={RouterLink} to="/url-checker" disableRipple >To Url Checker</Button>
+						<Button onClick={handleLogout}>Log Out</Button>
+					</Box>
+				</Paper>
 			)}
 		</Container>
 	);

@@ -154,17 +154,16 @@ function ResultDisplay({phishProb, confidence, data, startProb}) {
 				</Box>
 			</Paper>
 
-			{isOthers&&(
-				<Typography variant='h5'>Other Features</Typography>
-			)}
-
 			{currentFeatureId && (currentFeatureId != "") &&(
-				<Paper className='page-section'>
+				<Paper className='page-section url-checker-result'>
 					{(currentFeatureId != 'other')&& (
 						<AboutFeature
 						featureId={currentFeatureId}
 						value={data[currentFeatureId].value}
 						/>
+					)}
+					{isOthers&&(
+						<Typography variant='h5'>Other Features</Typography>
 					)}
 					{(currentFeatureId == 'other')&& (
 						<div className='feature-desc-container'>	
@@ -276,45 +275,46 @@ export default function UrlChecker({user, loggedIn, history, setHistory}) {
 				PhishGuard URL Checker
 			</Typography>
 
-			{loggedIn && (
-				<Typography variant='h4'>
-					Hello {user},
-				</Typography>
-			)}
+			<Box className='url-checker-hero-greeting'>
+				{loggedIn && (
+					<Typography variant='h4' className='url-checker-greeting'>
+						Hello {user},
+					</Typography>
+				)}
+				<Paper className='url-checker-hero'>
+					<Typography variant='h5' component="h2" className='url-checker-subtitle'>
+						Scan your URL
+					</Typography>
 
-			<Paper className='url-checker-hero'>
-				<Typography variant='h5' component="h2" className='url-checker-subtitle'>
-					Scan your URL
-				</Typography>
+					<form onSubmit={handleSubmit} className='url-checker-form'>
+						<TextField
+						label="Enter URL"
+						value={url}
+						onChange={(event) => setUrl(event.target.value)}
+						placeholder='example.com'
+						fullWidth
+						/>
 
-				<form onSubmit={handleSubmit} className='url-checker-form'>
-					<TextField
-					label="Enter URL"
-					value={url}
-					onChange={(event) => setUrl(event.target.value)}
-					placeholder='example.com'
-					fullWidth
-					/>
+						<Button
+						type='submit'
+						variant='contained'
+							size='large'
+						className='glow-button'
+						>
+							Analyse
+						</Button>
+					</form>
 
-					<Button
-					type='submit'
-					variant='contained'
-						size='large'
-					className='glow-button'
-					>
-						Analyse
-					</Button>
-				</form>
-
-				{ loading? (
-						<Typography className='url-checker-feedback'>Analysing URL...</Typography>
-					):(
-						error && (
-						<Typography className='url-checker-feedback' color='error' role='alert'>{error}</Typography>
+					{ loading? (
+							<Typography className='url-checker-feedback'>Analysing URL...</Typography>
+						):(
+							error && (
+							<Typography className='url-checker-feedback' color='error' role='alert'>{error}</Typography>
+							)
 						)
-					)
-				}
-			</Paper>
+					}
+				</Paper>
+			</Box>
 			
 			{(haveReturn) && (
 			<Container>
