@@ -20,8 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `phishing_url_checker`
 --
-
-CREATE DATABASE phishing_url_checker;
+CREATE DATABASE IF NOT EXISTS `phishing_url_checker` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `phishing_url_checker`;
 
 -- --------------------------------------------------------
 
