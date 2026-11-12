@@ -28,7 +28,7 @@ CORSMiddleware,
 class UrlRequest(BaseModel):
     url: str
 
-class SignUpRequest(BaseModel):
+class UserData(BaseModel):
     username: str
     password: str
 
@@ -41,13 +41,13 @@ def process_data(payload: UrlRequest):
 def read_root():
     return {"message": "Welcome to the Phishing URL Checker API!"}
 
-@app.get("/log-in")
-def log_in(username: str, password: str):
-    login = login_user(username, password)
+@app.post("/log-in")
+def log_in(request: UserData):
+    login = login_user(request.username, request.password)
     return login
 
 @app.post("/sign-up")
-def sign_up(request: SignUpRequest):
+def sign_up(request: UserData):
     create_user(request.username, request.password)
     user = get_user_by_username(request.username)
     if user != None:
