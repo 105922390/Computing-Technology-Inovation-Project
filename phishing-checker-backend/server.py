@@ -103,7 +103,14 @@ def login(credentials: UserData, request: Request):
         "error" : login["error"]
         }
 
-@app.post("/log-out")
+@app.post(
+    "/log-out",
+    tags=["users"],
+    summary="Log out the current user",
+    description="Clears the current browser session, ending the user's logged-in state.",
+    response_description="A null response after the session is cleared.",
+    responses=meta.logout_responses,
+)
 def logout(request: Request):
     request.session.clear()
 
@@ -150,7 +157,15 @@ def check_username_free(
     available = existing is None
     return available
 
-@app.get("/user-data")
+
+@app.get(
+    "/user-data",
+    tags=["users"],
+    summary="Get the current session's user",
+    description="Checks the browser session to determine whether a user is logged in and, if so, returns their public profile.",
+    response_description="The login state and, when logged in, the user's public ID and username.",
+    responses=meta.user_data_responses,
+)
 def user_data(request: Request):
     user_id = request.session.get("user_id") 
 
@@ -158,8 +173,13 @@ def user_data(request: Request):
         return {"logged_in": False}
     
     user = get_user(user_id)
+    if user is None:
+        return {"logged_in": False}
 
     return {
-            "logged_in": False,
-            "user": user
+            "logged_in": True,
+            "user": {
+                "id": user.id,
+                "username": user.username,
+            }
             }

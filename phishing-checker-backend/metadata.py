@@ -144,11 +144,11 @@ signup_responses = {
 				"examples": {
 					"success": {
 						"summary": "Account successfully created",
-						"value": {True}
+						"value": True
 					},
 					"error": {
 						"summary": "Account not created",
-						"value": {False}
+						"value": False
 					},
 					}
 				},
@@ -176,23 +176,76 @@ username_available_responses = {
 				"examples": {
 					"available": {
 						"summary": "Username is available",
-						"value": {True}
+						"value": True
 					},
 					"unavailable": {
 						"summary": "Username is not available",
-						"value": {False}
+						"value": False
 					},
-					}
-				},
+				}
 			}
+		}
 	},
-	
 	503: {
-		"description": "Too many requests - sign-up aborted.",
+		"description": "Too many requests - username lookup aborted.",
 		"content": {
 			"application/json": {
 				"example": {"detail": "Too many requests. Please retry later."}
-						
+			}
+		},
+	},
+}
+
+
+logout_responses = {
+	200: {
+		"description": "The current session has been cleared.",
+		"content": {
+			"application/json": {
+				"example": None
+			}
+		}
+	},
+	503: {
+		"description": "Too many requests - logout aborted.",
+		"content": {
+			"application/json": {
+				"example": {"detail": "Too many requests. Please retry later."}
+			}
+		},
+	},
+}
+
+
+user_data_responses = {
+	200: {
+		"description": "Current session status and public user data, if logged in.",
+		"content": {
+			"application/json": {
+				"examples": {
+					"loggedOut": {
+						"summary": "No active user session",
+						"value": {"logged_in": False}
+					},
+					"loggedIn": {
+						"summary": "Active user session",
+						"value": {
+							"logged_in": True,
+							"user": {
+								"id": 123,
+								"username": "JohnBox"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	503: {
+		"description": "Too many requests - user lookup aborted.",
+		"content": {
+			"application/json": {
+				"example": {"detail": "Too many requests. Please retry later."}
 			}
 		},
 	},

@@ -26,7 +26,7 @@ import './css/style.css'
 async function checkLogin(){
     const response = await axios.get(
         `${API_BASE_URL}/user-data`,
-        {credentials: true},
+        {withCredentials: true},
     )
     return response.data
 } 
@@ -41,7 +41,7 @@ function App({ themeMode, onToggleThemeMode, history, setHistory }) {
 			try{
 				const result = await checkLogin();
 				setLoggedIn(result.logged_in)
-				setUser(result.user.username)
+				setUser(result.user?.username ?? null)
 			} catch (requestError) {
 				console.error(requestError);
 				setLoggedIn(false)
