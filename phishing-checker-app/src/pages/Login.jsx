@@ -72,27 +72,21 @@ export default function Login({user, setUser, loggedIn, setLoggedIn}) {
 			if (result.success){
 				setUser(username)
 			}
-		} catch (requestError) {
-				const responseStatus = requestError.response?.status;
+		} catch (error) {
 
-				switch (responseStatus) {
-					case 503:
-						setGeneralError('Too many requests! Please wait before trying again.');
-						break;
+				const status = error.response?.status
 
-					case null:
-						setGeneralError('Unable to reach the server. Please try again.');
-						break;
-				
-					default:
-						setGeneralError(
-							'Error analysing URL. Please try again. | ' +
-							'Error code: ' + toString(responseStatus)
-						);
-						break;
+				if (status === 503) {
+					setGeneralError('Too many requests! Please wait before trying again.');
+				} else if (status == null) {
+					setGeneralError('Unable to reach the server. Please try again.');
+				} else {
+					setGeneralError(
+						'Something went wrong. Please try again. | Error code: ' + status
+					);
 				}
 
-				console.error(requestError);
+				console.error(error);
 			}
 	}
 
@@ -104,6 +98,17 @@ export default function Login({user, setUser, loggedIn, setLoggedIn}) {
 			setUser(null)
 			setSuccess(false)
 		} catch (error) {
+			const status = error.response?.status
+
+			if (status === 503) {
+				setGeneralError('Too many requests! Please wait before trying again.');
+			} else if (status == null) {
+				setGeneralError('Unable to reach the server. Please try again.');
+			} else {
+				setGeneralError(
+					'Something went wrong. Please try again. | Error code: ' + status
+				);
+			}
 			console.error(error);
 		}
 	}

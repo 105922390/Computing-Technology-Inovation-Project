@@ -251,28 +251,19 @@ export default function UrlChecker({user, loggedIn, history, setHistory}) {
 			}
 
 			
-		} catch (requestError) {
-			const responseStatus = requestError.response?.status;
+		} catch (error) {
+			const status = error.response?.status
 
-			switch (responseStatus) {
-				case 503:
-					setError('Too many requests! Please wait before trying again.');
-					break;
-
-				case null:
-					setError('Unable to reach the server. Please try again.');
-					break;
-			
-				default:
-					setError(
-						'Error analysing URL. Please try again. | ' +
-						'Error code: ' + toString(responseStatus)
-					);
-					break;
+			if (status === 503) {
+				setError('Too many requests! Please wait before trying again.');
+			} else if (status == null) {
+				setError('Unable to reach the server. Please try again.');
+			} else {
+				setError(
+					'Something went wrong. Please try again. | Error code: ' + status
+				);
 			}
-
-			console.error(requestError);
-
+			console.error(error);
 		} finally {
 			setLoading(false);
 		}
