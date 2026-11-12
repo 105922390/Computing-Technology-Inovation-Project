@@ -1,14 +1,28 @@
 import os
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
+from typing import Annotated
 from predict import predict_url
 from rate_limit import RateLimiter, RateLimitMiddleware
 from user_repositiory import login_user, create_user, get_user_by_username
+import metadata as meta
 
 
-app = FastAPI()
+tags_metadata = [
+	{
+        "name": "url-checking",
+        "description": "Operations relating to evaluating URLs for signs of phishing",
+	},
+    {
+        "name": "users",
+		"description": "Operations relating to user and account controls.",
+	},
+]
+
+
+app = FastAPI(openapi_tags=tags_metadata)
 
 rate_limiter = RateLimiter(
     max_requests=int(os.getenv("RATE_LIMIT_MAX_REQUESTS", "3")),
@@ -26,28 +40,65 @@ CORSMiddleware,
 )
 
 class UrlRequest(BaseModel):
-    url: str
+    url: str = Field(
+        description="The URL to check for phishing.",
+        examples=["https://example.com"],
+    )
 
 class UserData(BaseModel):
-    username: str
-    password: str
+    username: str = Field(
+        description="The user's inputted username.",
+        examples=["JohnBox"],
+    )
+    password: str = Field(
+        description="The user's inputted password.",
+        examples=["Pa$$word123"],
+    )
 
-@app.post("/process-data")
+
+@app.post(
+	"/process-data", 
+	tags=["url-checking"],
+    summary="Evaluate a URL",
+    description="Sends the submitted URL through the AI model and \
+        returns an assesment and breakdown of how likely that link is to be phishing.",
+    response_description="The prediction, confidence, and supporting evidence.",
+    responses=meta.process_data_responses,
+)
 def process_data(payload: UrlRequest):
     result = predict_url(payload.url)
     return {"result": result}
+
 
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the Phishing URL Checker API!"}
 
-@app.post("/log-in")
+
+@app.post(
+        "/log-in", 
+	tags=["users"],
+    summary="Attempts to log the user in",
+    description="Takes the given username and password, checks to see if they are valid and correct, then returns the result.",
+    response_description="Whether the user should be logged in or not.",
+    responses=meta.login_responses,
+)
 def log_in(request: UserData):
     login = login_user(request.username, request.password)
     return login
 
-@app.post("/sign-up")
+
+@app.post("/sign-up", 
+	tags=["users"],
+    summary="Attempts to sign a new user up",
+    description="Takes the given username and password, checks to see if they are valid and correct, then returns the result.",
+    response_description="Whether the new user profile has been successfully created.",
+    responses=meta.signup_responses,
+)
 def sign_up(request: UserData):
+    if get_user_by_username(request.username):
+        return False
+    
     create_user(request.username, request.password)
     user = get_user_by_username(request.username)
     if user != None:
@@ -55,8 +106,17 @@ def sign_up(request: UserData):
     else:
         return False
 
-@app.get("/check-username-free")
-def check_username_free(username: str):
+
+@app.get("/check-username-free", 
+	tags=["users"],
+    summary="Checks if a given username is available",
+    description="Queries the user database to see if the given username is available.",
+    response_description="Boolean representing if the username is available",
+    responses=meta.username_available_responses,
+)
+def check_username_free(
+    	username: Annotated[str, Query(description="The username to check for availability.")]
+    ):
     existing = get_user_by_username(username)
     available = existing is None
     return available
