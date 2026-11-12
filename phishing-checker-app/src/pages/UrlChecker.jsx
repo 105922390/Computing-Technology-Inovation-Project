@@ -187,11 +187,10 @@ async function fetchPrediction(inputUrl){
 	);
 	
 	return response
-} 
+}
 
 
-
-export default function UrlChecker({history, setHistory}) {
+export default function UrlChecker({user, loggedIn, history, setHistory}) {
 	useEffect(() => {
 		document.title = 'URL Checker';
 	}, []);
@@ -285,6 +284,12 @@ export default function UrlChecker({history, setHistory}) {
 			<Typography variant='h2' component='h1' gutterBottom>
 				PhishGuard URL Checker
 			</Typography>
+
+			{loggedIn && (
+				<Typography variant='h4'>
+					Hello {user},
+				</Typography>
+			)}
 
 			<Paper className='url-checker-hero'>
 				<Typography variant='h5' component="h2" className='url-checker-subtitle'>

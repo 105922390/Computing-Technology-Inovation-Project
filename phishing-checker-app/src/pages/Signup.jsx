@@ -35,7 +35,7 @@ async function createUser(username, password){
 	return response.data
 } 
 
-export default function Help() {
+export default function Signup({user, loggedIn}) {
 	useEffect(() => {
 		document.title = 'Sign Up';
 	}, []);
@@ -102,47 +102,49 @@ export default function Help() {
 				Sign Up
 			</Typography>
 
-			<Typography variant='p' component="p" gutterBottom>
-				Don't like Phish? Create an account with PhishGuard!
-			</Typography>
+			{(!loggedIn) && (
+				<Typography variant='p' component="p" gutterBottom>
+					Don't like Phish? Create an account with PhishGuard!
+				</Typography>
+			)}
 
 			<form onSubmit={handleSubmit} className='url-checker-form'>
-					<TextField
-					label="Username"
-					value={username}
-					onChange={(event) => setUsername(event.target.value)}
-					placeholder= 'username'
-					fullWidth
-					/>
-					{(usernameError != null) && (
-						<Typography variant="caption" color='error' role='alert'>{usernameError}</Typography>
-					)}
+				<TextField
+				label="Username"
+				value={username}
+				onChange={(event) => setUsername(event.target.value)}
+				placeholder= 'username'
+				fullWidth
+				/>
+				{(usernameError != null) && (
+					<Typography variant="caption" color='error' role='alert'>{usernameError}</Typography>
+				)}
 
-					<TextField
-					label="Password"
-					value={password}
-					onChange={(event) => setPassword(event.target.value)}
-					placeholder= 'Password'
-					fullWidth
-					/>
-					{(passwordError != null) && (
-						<Typography variant="caption" color='error' role='alert'>{passwordError}</Typography>
-					)}
+				<TextField
+				label="Password"
+				value={password}
+				onChange={(event) => setPassword(event.target.value)}
+				placeholder= 'Password'
+				fullWidth
+				/>
+				{(passwordError != null) && (
+					<Typography variant="caption" color='error' role='alert'>{passwordError}</Typography>
+				)}
 
-					<Button
-					type='submit'
-					variant='contained'
-						size='large'
-					className='glow-button'
-					>
-						Sign Up
-					</Button>
+				<Button
+				type='submit'
+				variant='contained'
+					size='large'
+				className='glow-button'
+				>
+					Sign Up
+				</Button>
 			</form>
 			
 			{(generalError != null) && (
 				<Typography variant="caption" color='error' role='alert'>{generalError}</Typography>
 			)}
-			{success && (
+			{(success) && (
 				<Box>
 					<Typography variant='h5' component="h2" gutterBottom>
 					Account created successfully!
@@ -150,6 +152,11 @@ export default function Help() {
 
 					<Button color="inherit" component={RouterLink} to="/login" disableRipple >Go to login</Button>
 				</Box>
+			)}
+			{(loggedIn && !success) && (
+				<Typography color='textSecondary' variant='p' component="p" gutterBottom>
+					Note: you are currently logged in as: "{user}", are you sure you want to make another account?
+				</Typography>
 			)}
 		</Container>
 	);

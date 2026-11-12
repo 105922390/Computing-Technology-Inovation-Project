@@ -1,13 +1,13 @@
 import os
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from predict import predict_url
 from rate_limit import RateLimiter, RateLimitMiddleware
 from settings import SESSION_SECRET_KEY
-from user_repositiory import verify_user, create_user, get_user_by_username
+from user_repositiory import verify_user, create_user, get_user_by_username, get_user
 
 
 
@@ -48,10 +48,22 @@ def process_data(payload: UrlRequest):
 def read_root():
     return {"message": "Welcome to the Phishing URL Checker API!"}
 
-@app.post("/verify-user")
-def log_in(request: UserData):
-    login = verify_user(request.username, request.password)
-    return login
+@app.post("/log-in")
+def login(credentials: UserData, request: Request):
+    login = verify_user(credentials.username, credentials.password)
+
+    if (login and login["success"] == True):
+        request.session["user_id"] = login["user_id"]
+        return {"success": True}
+    
+    return {
+        "success": False,
+        "error" : login["error"]
+        }
+
+@app.post("/log-out")
+def logout(request: Request):
+    request.session.clear()
 
 @app.post("/sign-up")
 def sign_up(request: UserData):
@@ -67,3 +79,17 @@ def check_username_free(username: str):
     existing = get_user_by_username(username)
     available = existing is None
     return available
+
+@app.get("/user-data")
+def user_data(request: Request):
+    user_id = request.session.get("user_id") 
+
+    if not user_id:
+        return {"logged_in": False}
+    
+    user = get_user(user_id)
+
+    return {
+            "logged_in": False,
+            "user": user
+            }

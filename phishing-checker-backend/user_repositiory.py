@@ -76,12 +76,21 @@ def verify_user(username:str, password: str):
     if not user:
         # return # Uncomment for testing purposes
         password_hash.verify(password, DUMMY_HASH)
-        return {"error": "Invalid username or password"}
+        return {
+            "success": False,
+            "error": "Invalid username or password"
+            }
 
     if not check_password(
         password,
         user.password_hash
     ):
-        return {"error": "Invalid username or password"}
+        return {
+            "success": False,
+            "error": "Invalid username or password"
+            }
 
-    return {"success": True}
+    return {
+            "success": True,
+            "user_id": user.id
+            }

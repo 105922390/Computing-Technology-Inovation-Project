@@ -1,5 +1,8 @@
 import { Route, Routes } from 'react-router';
 import { lazy, Suspense } from 'react';
+import { useEffect, useState } from 'react';
+import { API_BASE_URL } from './services/api.js';
+import axios from 'axios';
 
 // Pages
 const Home = lazy(() => import('./pages/Home.jsx'));
@@ -20,8 +23,33 @@ import MainLayout from './layouts/MainLayout.jsx'
 import './css/style.css'
 
 
+async function checkLogin(){
+    const response = await axios.get(
+        `${API_BASE_URL}/user-data`,
+        {credentials: true},
+    )
+    return response.data
+} 
+
 // Route the pages
 function App({ themeMode, onToggleThemeMode, history, setHistory }) {
+	const [loggedIn, setLoggedIn] = useState(false);
+	const [user, setUser] = useState(String);
+	
+	useEffect(() => {
+		async function loadUser() {
+			try{
+				const result = await checkLogin();
+				setLoggedIn(result.logged_in)
+				setUser(result.user.username)
+			} catch (requestError) {
+				console.error(requestError);
+				setLoggedIn(false)
+			}
+		}
+		loadUser();
+	}, [])
+
 	return (
 		<Suspense fallback={<p>Loading page…</p>}>
 			<Routes>
@@ -32,9 +60,9 @@ function App({ themeMode, onToggleThemeMode, history, setHistory }) {
 					<Route path="/about-the-tool" element={<AboutTool />} />
 					<Route path="/about-phishing" element={<AboutPhishing />} />
 					<Route path="/help" element={<Help />} />
-					<Route path="/url-checker" element={<UrlChecker history={history} setHistory={setHistory} />} />
-					<Route path="/login" element={<Login />} />
-					<Route path="/signup" element={<Signup />} />
+					<Route path="/url-checker" element={<UrlChecker user={user} loggedIn = {loggedIn} history={history} setHistory={setHistory} />} />
+					<Route path="/login" element={<Login user={user} setUser={setUser} loggedIn = {loggedIn} setLoggedIn = {setLoggedIn}/>} />
+					<Route path="/signup" element={<Signup user={user} loggedIn = {loggedIn}/>} />
 					<Route path="/error-unexpected-failure" element={<UnexpectedFailure />} />
 					<Route path="*" element={<PageNotExist />} />
 				</Route>
