@@ -185,9 +185,10 @@ async function fetchPrediction(inputUrl){
 		`${API_BASE_URL}/process-data`,
 		{ url : inputUrl }
 	);
-
-	return response.data.result
+	
+	return response
 } 
+
 
 
 export default function UrlChecker({history, setHistory}) {
@@ -221,10 +222,13 @@ export default function UrlChecker({history, setHistory}) {
 
 		try {
 			// Axios call to backend, ask predicted saftey of provided url
-			const result = await fetchPrediction(url);
-			console.log("got return");
+			const response = await fetchPrediction(url);
+			
+			const result = response.data.result
+			// console.log(result)
+			// console.log("got return");
 			setError(result.error);
-			console.log(result.result_data)
+			// console.log(result.result_data)
 			if (result.result_data != undefined){
 				setPishProb(result.phish_prob);
 				setConfidence(result.confidence);
@@ -248,9 +252,28 @@ export default function UrlChecker({history, setHistory}) {
 			}
 
 			
-		} catch (error) {
-			setError('Error analysing url. Please try again. | ' + error);
-			console.error(error);
+		} catch (requestError) {
+			const responseStatus = requestError.response?.status;
+
+			switch (responseStatus) {
+				case 503:
+					setError('Too many requests! Please wait before trying again.');
+					break;
+
+				case null:
+					setError('Unable to reach the server. Please try again.');
+					break;
+			
+				default:
+					setError(
+						'Error analysing URL. Please try again. | ' +
+						'Error code: ' + toString(responseStatus)
+					);
+					break;
+			}
+
+			console.error(requestError);
+
 		} finally {
 			setLoading(false);
 		}

@@ -73,6 +73,7 @@ class RateLimitMiddleware:
             return
 
         client = scope.get("client")
+        # client[0] is IP, [1] is port
         source = client[0] if client else "unknown"
         retry_after = self.limiter.retry_after(source)
 
