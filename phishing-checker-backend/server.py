@@ -27,14 +27,17 @@ tags_metadata = [
 app = FastAPI(openapi_tags=tags_metadata)
 
 rate_limiter = RateLimiter(
-    max_requests=int(os.getenv("RATE_LIMIT_MAX_REQUESTS", "3")),
-    window_seconds=float(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "5")),
+    max_requests=int(os.getenv("RATE_LIMIT_MAX_REQUESTS", "5")),
+    window_seconds=float(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "10")),
 )
+
 app.add_middleware(RateLimitMiddleware, limiter=rate_limiter)
 
 app.add_middleware(
 CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173"
+                   #    "http://<local_ip>:5173"	## For hosting
+                   ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -132,7 +135,16 @@ def sign_up(request: UserData):
     responses=meta.username_available_responses,
 )
 def check_username_free(
-    	username: Annotated[str, Query(description="The username to check for availability.", example="JohnBox")]
+    	username: Annotated[str, Query(
+            description="The username to check for availability.", 
+            openapi_examples={
+                "sample" : { 
+                    "summary": "Example username", 
+                    "value": "JohnBox",
+                    }
+                } 
+            )
+		]
     ):
     existing = get_user_by_username(username)
     available = existing is None

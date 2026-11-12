@@ -32,23 +32,23 @@ export default function About() {
 
 function AboutUsImages() {
 	return (
-		<div style={{display: 'flex', justifyContent: 'center' }}>
+		<div style={{display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
 
-		<figure>
+		<figure style={{ margin: '10px' }}>
 			<img src={julian} alt='Julian Image' width='180' height='180' style={{border: '5px solid #4cc9ff', borderRadius: '8px', margin: '30px'}}/>
 			<figcaption style={{ display: 'flex', justifyContent: 'center', marginTop: '1px', color: '#555', fontSize: '24px' }}>
 				Julian
 			</figcaption>
 		</figure>
 
-		<figure>
+		<figure style={{ margin: '10px' }}>
 			<img src={Figpie} alt='Figpie Image' width='180' height='180' style={{border: '5px solid #4cc9ff', borderRadius: '8px', margin: '30px'}}/>
 			<figcaption style={{ display: 'flex', justifyContent: 'center', marginTop: '1px', color: '#555', fontSize: '24px' }}>
 				Asha
 			</figcaption>
 		</figure>
 
-		<figure>
+		<figure style={{ margin: '10px' }}>
 			<img src={Chambellium} alt='Chambellium Image' width='180' height='180' style={{border: '5px solid #4cc9ff', borderRadius: '8px', margin: '30px'}}/>
 			<figcaption style={{ display: 'flex', justifyContent: 'center', marginTop: '1px', color: '#555', fontSize: '24px' }}>
 				Campbell
