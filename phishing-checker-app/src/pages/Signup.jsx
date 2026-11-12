@@ -64,13 +64,13 @@ export default function Help() {
 			return
 		}
 
-		const available = await checkUsernameAvailable(username)
-		if (!available){
-			setUsernameError("Username unavailable. Try another.")
-			return
-		}
-
 		try {
+			const available = await checkUsername(username)
+			if (!available) {
+				setUsernameError("Username unavailable. Try another.")
+				return
+			}
+
 			const result = await createUser(username, password)
 			console.log(result)
 			if (!result){
@@ -80,21 +80,18 @@ export default function Help() {
 				setSuccess(true)
 			}
 		} catch (error) {
-			setGeneralError(error)
-			console.error(error);
-		} finally {
+			const status = error.response?.status
 
-		}
-	}
-
-	const checkUsernameAvailable = async (username) => {
-		try{
-			const isAvailable = await checkUsername(username)
-			return isAvailable
-		} catch (error) {
-			setGeneralError(error)
+			if (status === 503) {
+				setGeneralError('Too many requests! Please wait before trying again.');
+			} else if (status == null) {
+				setGeneralError('Unable to reach the server. Please try again.');
+			} else {
+				setGeneralError(
+					'Something went wrong. Please try again. | Error code: ' + status
+				);
+			}
 			console.error(error);
-			return false
 		}
 	}
 

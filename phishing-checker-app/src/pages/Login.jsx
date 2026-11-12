@@ -63,7 +63,18 @@ export default function Help() {
 				setSuccess(result.success)
 			}
 		} catch (error) {
-			setGeneralError(error)
+			const status = error.response?.status
+
+			if (status === 503) {
+				setGeneralError('Too many requests! Please wait before trying again.');
+			} else if (status == null) {
+				setGeneralError('Unable to reach the server. Please try again.');
+			} else {
+				setGeneralError(
+					'Something went wrong. Please try again. | Error code: ' + status
+				);
+			}
+			console.error(error);
 		}
 	}
 
