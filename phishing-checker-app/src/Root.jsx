@@ -3,7 +3,6 @@ import { BrowserRouter } from "react-router";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import App from "./App.jsx";
-import { AlignHorizontalCenter } from "@mui/icons-material";
 
 // import 'package:google_fonts/google_fonts.dart';
 
