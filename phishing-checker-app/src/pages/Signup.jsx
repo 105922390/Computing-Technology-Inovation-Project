@@ -169,20 +169,22 @@ export default function Signup({user, loggedIn}) {
 				{(generalError != null) && (
 					<Typography variant="caption" color='error' role='alert'>{generalError}</Typography>
 				)}
-				{(success) && (
-					<Box>
-						<Typography variant='h5' component="h2" gutterBottom>
-						Account created successfully!
-						</Typography>
+				<box className="login-signup-confirm">
+					{(success) && (
+						<Box>
+							<Typography color='primary' variant='subtitle1' component="h2">
+							Account created successfully!
+							</Typography>
 
-						<Button color="inherit" component={RouterLink} to="/login" disableRipple >Go to login</Button>
-					</Box>
-				)}
-				{(loggedIn && !success) && (
-					<Typography color='textSecondary' variant='p' component="p" gutterBottom>
-						Note: you are currently logged in as: "{user}", are you sure you want to make another account?
-					</Typography>
-				)}
+							<Button color="inherit" component={RouterLink} to="/login" disableRipple >Go to login</Button>
+						</Box>
+					)}
+					{(loggedIn && !success) && (
+						<Typography color='textSecondary' variant='p' component="p">
+							Note: you are currently logged in as: "{user}", are you sure you want to make another account?
+						</Typography>
+					)}
+				</box>
 			</Paper>
 		</Container>
 	);

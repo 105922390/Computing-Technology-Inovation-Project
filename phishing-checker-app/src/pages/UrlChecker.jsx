@@ -277,7 +277,7 @@ export default function UrlChecker({user, loggedIn, history, setHistory}) {
 
 			<Box className='url-checker-hero-greeting'>
 				{loggedIn && (
-					<Typography variant='h4' className='url-checker-greeting'>
+					<Typography variant='h5' className='url-checker-greeting'>
 						Hello {user},
 					</Typography>
 				)}

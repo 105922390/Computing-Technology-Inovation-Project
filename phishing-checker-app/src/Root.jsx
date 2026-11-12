@@ -291,7 +291,8 @@ function Root() {
 						flex: 1,
 						minWidth: 0,
 					},
-					".login-confirm":{
+					".login-signup-confirm":{
+						marginTop:"2rem",
 						textAlign:"center",
 						display: "flex",
 						flexDirection:"column",

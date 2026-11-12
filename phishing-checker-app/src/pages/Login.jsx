@@ -165,7 +165,7 @@ export default function Login({user, setUser, loggedIn, setLoggedIn}) {
 			)}
 			
 			{(success || loggedIn) && (
-				<Paper className="login-confirm paper-section hero">
+				<Paper className="login-signup-confirm paper-section hero">
 					<Typography variant="h5" component="h2">
 						Welcome {user}, you are logged in!
 					</Typography>
