@@ -141,7 +141,8 @@ export default function Login({user, setUser, loggedIn, setLoggedIn}) {
 							label="Password"
 							value={password}
 							onChange={(event) => setPassword(event.target.value)}
-							placeholder= 'Password'
+							placeholder='Password'
+							type="password"
 							fullWidth
 							/>
 							{(passwordError != null) && (

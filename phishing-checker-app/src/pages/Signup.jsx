@@ -150,6 +150,7 @@ export default function Signup({user, loggedIn}) {
 						onChange={(event) => setPassword(event.target.value)}
 						placeholder= 'Password'
 						fullWidth
+						type="password"
 						/>
 						{(passwordError != null) && (
 							<Typography variant="caption" color='error' role='alert'>{passwordError}</Typography>
