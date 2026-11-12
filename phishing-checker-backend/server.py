@@ -115,7 +115,7 @@ def sign_up(request: UserData):
     responses=meta.username_available_responses,
 )
 def check_username_free(
-    	username: Annotated[str, Query(description="The username to check for availability.")]
+    	username: Annotated[str, Query(description="The username to check for availability.", example="JohnBox")]
     ):
     existing = get_user_by_username(username)
     available = existing is None
