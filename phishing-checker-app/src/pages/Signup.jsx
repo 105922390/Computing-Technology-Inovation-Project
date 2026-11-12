@@ -7,10 +7,11 @@ import {
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Link as RouterLink } from 'react-router';
+import { API_BASE_URL } from '../services/api.js';
 
 async function checkUsername(username){
 	const response = await axios.get(
-		'http://localhost:8000/check-username-free', 
+		`${API_BASE_URL}/check-username-free`,
 		{
 			params: 
 			{ 
@@ -24,7 +25,7 @@ async function checkUsername(username){
 
 async function createUser(username, password){
 	const response = await axios.post(
-		'http://localhost:8000/sign-up', 
+		`${API_BASE_URL}/sign-up`,
 		{
 			username, 
 			password

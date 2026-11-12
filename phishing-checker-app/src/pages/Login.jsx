@@ -6,10 +6,11 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { API_BASE_URL } from '../services/api.js';
 
 async function fetchLogin(username, password){
 	const response = await axios.get(
-		'http://localhost:8000/log-in', 
+		`${API_BASE_URL}/log-in`,
 		{
 			params: { 
 				username : username,

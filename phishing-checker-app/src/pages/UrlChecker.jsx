@@ -10,6 +10,7 @@ import {
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { PieChart } from '@mui/x-charts/PieChart';
+import { API_BASE_URL } from '../services/api.js';
 // import DonutChart from "../components/visualisations/URLDonutChart.jsx";
 import WaterfallChart from "../components/visualisations/ContributionWaterfallGraph.jsx";
 import AboutFeature from "../components/FeatureDetails.jsx"
@@ -181,7 +182,7 @@ function ResultDisplay({phishProb, confidence, data, startProb}) {
 
 async function fetchPrediction(inputUrl){
 	const response = await axios.post(
-		'http://localhost:8000/process-data', 
+		`${API_BASE_URL}/process-data`,
 		{ url : inputUrl }
 	);
 
